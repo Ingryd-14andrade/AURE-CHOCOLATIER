@@ -1413,10 +1413,14 @@ function tocarSino(forcar){
 }
 /* ===== PEDIDOS NOVOS (chegaram do cardápio e ainda não foram vistos) ===== */
 const novos = () => Object.values(S.enc).filter(e=>e.origem==='cardapio' && !e.visto && e.status!=='entregue').sort((x,y)=>String(y.criado||'').localeCompare(String(x.criado||'')));
+function zqMatch(){ const z = UI.zq||{}; if(!telOk(z.tel)) return '';
+  const es = Object.values(S.enc).filter(e=>e.status!=='entregue' && sameTel(e.tel,z.tel)); if(!es.length) return '';
+  return es.map(e=>`<div style="background:#fff;border:1.5px solid #25d366;border-radius:20px;padding:14px;margin:0 0 10px"><div style="font:600 14px var(--sans);color:var(--wine);margin-bottom:4px">✅ Essa cliente já fez o pedido${e.num?' #'+e.num:''}</div><div style="font:400 13px var(--sans);color:#8a6f62;margin-bottom:10px">${esc(e.cliente)} · ${(e.itens||[]).map(i=>esc(i.nome)).join(', ')} · ${brl(e.total)}</div><div class="es-acts" style="margin:0">${waBtn(e)}</div></div>`).join(''); }
 function zapBox(){ const z = UI.zq || (UI.zq = {tel:'',nome:''});
   return `<div class="zq"><h3>💬 Cliente chamou no Zap?</h3><p>Cole o número dela aqui. Não precisa salvar o contato.</p>
   <input class="in" id="zq-tel" inputmode="tel" placeholder="Cole o WhatsApp · ex: 27 99999-9999" value="${esc(z.tel)}" aria-label="WhatsApp da cliente">
   <input class="in" id="zq-nome" placeholder="Nome (opcional)" value="${esc(z.nome)}" aria-label="Nome da cliente">
+  <div id="zq-match">${zqMatch()}</div>
   <div class="zq-b"><button data-act="zq-msg" data-k="catalogo">🍫 Mandar cardápio</button><button data-act="zq-msg" data-k="pix">💳 Mandar Pix</button><button class="zq-n" data-act="zq-enc">+ Criar pedido dela</button></div></div>`; }
 function novosBanner(){ const n = novos(); if(!n.length) return '';
   return `<button class="novo-b" data-act="ver-novos"><span class="sino">🔔</span><div><b>${n.length===1?'Chegou 1 pedido novo!':'Chegaram '+n.length+' pedidos novos!'}</b><small>${n.slice(0,3).map(e=>esc(String(e.cliente||'').split(' ')[0])+' · '+esc(((e.itens||[])[0]||{}).nome||'').replace(/^Caixa /,'')).join('<br>')}</small></div><span class="ir">ver ›</span></button>`; }
@@ -1589,7 +1593,7 @@ async function entregarEnc(el){
 /* ===== MENSAGENS ===== */
 const MSG_PAD = {
   abordagem:{n:'Primeiro contato',t:'Olá{, nome}! Aqui é da {marca} 🤎\nQue alegria receber seu contato! Fazemos chocolates finos, feitos à mão e sob encomenda.\nQuer que eu te envie nosso catálogo com os sabores e preços?'},
-  catalogo:{n:'Enviar catálogo',t:'Olá{, nome}! Segue o catálogo da {marca}, com nossas caixas, sabores e preços 🤎 É só tocar no link:{link}\n\nPara encomendar é só me dizer a caixa, os sabores e a data de que você precisa.\nTrabalhamos com 50% de sinal via Pix para confirmar e o restante na entrega.'},
+  catalogo:{n:'Enviar cardápio',t:'Olá{, nome}! Que bom ter você por aqui 🤎\nSegue o cardápio da {marca}:{link}\n\nÉ só montar sua caixa e tocar em "Pedir pelo WhatsApp". O pedido chega pronto pra gente e aí te mandamos a confirmação com o Pix do sinal (50%).'},
   confirmacao:{n:'Confirmar encomenda',t:'Olá, {nome}! Sua encomenda {marca} está anotada 🤎\n\n{itens}\n\nTotal: {total}\nSinal (50%): {sinal50}\nRetirada: {entrega}\n\nPara confirmar, o sinal pode ser enviado por Pix: {pix}'},
   sinalok:{n:'Sinal recebido',t:'Oi, {nome}! Recebemos seu sinal de {sinal} 🤎\nSua encomenda {marca} está confirmada para {entrega}. Já já começamos a produzir!'},
   sinal:{n:'Lembrar do sinal',t:'Oi, {nome}! Passando para lembrar do sinal de {sinal50} para garantirmos sua encomenda de {entrega} 🤎\nChave Pix: {pix}'},
@@ -1868,7 +1872,7 @@ document.addEventListener('input',e=>{ if(['ct-para','ct-msg','ct-de'].includes(
 document.addEventListener('change',e=>{ if(['f-d','f-st'].includes(e.target.id)){ UI.f = {q:$('#f-q').value,d:$('#f-d').value,st:$('#f-st').value}; const l = $('#es-lista'); if(l) l.innerHTML = estLista(); } if(e.target.dataset.lc){ UI.lcFora = {...(UI.lcFora||{}), [e.target.dataset.lc]: !e.target.checked}; later(); }
   if(e.target.dataset.ckp){ marcarEtapa(e.target.dataset.ckp, +e.target.dataset.i, e.target.checked); } });
 document.addEventListener('input',e=>{
-  if(e.target.id==='zq-tel' || e.target.id==='zq-nome'){ UI.zq = {tel:$('#zq-tel').value, nome:$('#zq-nome').value}; }
+  if(e.target.id==='zq-tel' || e.target.id==='zq-nome'){ UI.zq = {tel:$('#zq-tel').value, nome:$('#zq-nome').value}; const m = $('#zq-match'); if(m) m.innerHTML = zqMatch(); }
   if(e.target.id==='nc-tel' || e.target.id==='nc-nome'){ $('#nc-msgs').innerHTML = ncMsgs($('#nc-tel').value,$('#nc-nome').value); }
   if(e.target.id==='cli-busca'){ const q = norm(e.target.value); $('#cli-list').innerHTML = clis().filter(c=>norm(c.nome).includes(q)||dig(c.tel).includes(dig(q)||'§')).map(cliRow).join('') || '<div class="empty">Nenhum cliente encontrado</div>'; }
 });
