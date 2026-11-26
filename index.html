@@ -484,7 +484,7 @@ void main(){
     return Math.round(up90(mat*MIX.mk + st.q*MIX.mo[st.f])*100)/100;
   }
   function preco(){ if (st.s==='Monte o seu') return precoMix(); return st.q==='+' ? null : D.p[st.s+'|'+st.f+st.q+'|'+st.c]; }
-  var SAC = [], ADD = false, MAXI = 5;
+  var SAC = [], ADD = false, MAXI = 50;
   function itemAtual(){
     var p = preco(), mx = st.s==='Monte o seu';
     var tam = st.q==='+' ? st.n+' '+nome(st.f,2) : (st.f==='t' && st.q===1) ? '1 barra de 55 g' : st.q+' '+nome(st.f,st.q);
@@ -741,7 +741,7 @@ window.addEventListener('scroll',function(){var t=document.querySelector('.topo'
         if (!window.firebase || !PEDIDO || /^COLE/.test(FIREBASE.apiKey)) return ok(false);
         if (!firebase.apps.length) firebase.initializeApp(FIREBASE);
         var P = PEDIDO, CN = {'40':'40%','75':'75%','br':'branco'};
-        var itens = (P.itens||[]).slice(0,5).map(function(I){
+        var itens = (P.itens||[]).slice(0,50).map(function(I){
           var n = I.q==='+' ? (I.n||12) : I.q;
           var tam = I.f==='t' ? (n===1?'1 barra 55 g':'Caixa 2 barras 55 g') : 'Caixa '+n+' '+(I.f==='q'?'quadradinhos':'barrinhas');
           return {tipo:'cx', nome: tam+' · '+(I.s==='Monte o seu' ? 'Monte o seu ('+(I.mix.join(', ')||'a combinar')+')' : I.s)+' · '+CN[I.c],
