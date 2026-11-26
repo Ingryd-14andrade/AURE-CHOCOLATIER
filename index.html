@@ -508,10 +508,9 @@ void main(){
     var pd = $('#pedir'); if (pd && !pd.dataset.enviando) pd.innerHTML = (its.length>1 ? 'Pedir tudo ('+its.length+' itens) pelo WhatsApp' : 'Pedir pelo WhatsApp')+' <span class="seta">→</span>';
   }
   function render(pulse){
-    if (st.f==='t'){ if (st.q!==1 && st.q!==2) st.q = 1; if (st.s==='Sortida') st.q = 2; }
+    if (st.f==='t'){ if (st.q!==1 && st.q!==2) st.q = (st.s==='Sortida' ? 2 : 1); if (st.s==='Sortida' && st.q===1) st.s = 'Clássica'; }
     else if (st.q===1 || st.q===2) st.q = 4;
     botoesQ();
-    var q1 = document.querySelector('#g-q [data-q="1"]'); if (q1) q1.disabled = st.s==='Sortida';
     document.querySelectorAll('#g-fmt .op').forEach(function(b){ b.classList.toggle('on', b.dataset.f===st.f); });
     document.querySelectorAll('#g-q .op').forEach(function(b){ b.classList.toggle('on', String(st.q)===b.dataset.q); });
     document.querySelectorAll('#g-c .op').forEach(function(b){ b.classList.toggle('on', b.dataset.c===st.c); });
@@ -552,7 +551,7 @@ void main(){
     if (d.f){ st.f = d.f; mudou = true; }
     if (d.q){ st.q = d.q==='+' ? '+' : +d.q; mudou = true; }
     if (d.c){ st.c = d.c; mudou = true; }
-    if (d.s){ st.s = d.s; mudou = true; }
+    if (d.s){ st.s = d.s; if (st.f==='t' && d.s==='Sortida') st.q = 2; mudou = true; }
     if (d.g){ var i = st.mix.indexOf(d.g); if (i>-1) st.mix.splice(i,1); else if (st.mix.length<4) st.mix.push(d.g); mudou = true; }
     if (d.d){ st.n = Math.max(11, st.n + (+d.d)); mudou = true; }
     if (d.sabor){ st.s = d.sabor; render(true); var alvo = $('#monte'); if (window.__lenis) window.__lenis.scrollTo(alvo,{duration:1.8}); else alvo.scrollIntoView({behavior:'smooth'}); return; }
