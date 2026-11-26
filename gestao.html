@@ -303,6 +303,7 @@ button:active,a:active{transform:scale(.96)}
 #nota hr{border:0;border-top:1px dashed #000;margin:6px 0}.nt-c{text-align:center}.nt-c b{display:block;font-size:20px;letter-spacing:.2em}.nt-c small{letter-spacing:.3em;font-size:9px}
 .nt-l{text-align:center;margin:6px 0;font-weight:bold}.nt-g{display:flex;justify-content:space-between;gap:8px}.nt-i{display:flex;justify-content:space-between;gap:8px;margin:2px 0}.nt-big{font-size:15px}.nt-o{font-size:11px}.nt-f{margin-top:10px;font-size:11px}
 .zq{background:linear-gradient(135deg,#fffaf4,#f6ece1);border:1.5px solid #ead7c3;border-radius:28px;padding:20px;margin:0 0 22px;box-shadow:0 10px 30px -18px rgba(90,20,30,.35)}.zq h3{margin:0 0 4px;font:600 17px var(--sans);color:var(--wine)}.zq p{margin:0 0 14px;font:400 13.5px var(--sans);color:#8a6f62}.zq .in{width:100%;box-sizing:border-box;border:1.5px solid #e6d3bf;border-radius:18px;padding:14px 16px;font:500 17px var(--sans);background:#fff;margin-bottom:10px}.zq-b{display:grid;grid-template-columns:1fr 1fr;gap:8px}.zq-b button{border:0;border-radius:18px;padding:14px 10px;font:600 14px var(--sans);background:#25d366;color:#fff}.zq-b .zq-n{grid-column:1/-1;background:var(--wine);color:#fff8f0}
+.es-feito{flex:1 1 100%;border-radius:20px;padding:12px 14px;background:#eaf8ef;border:1.5px solid #9fdcb5;color:#1f6b3d;font:600 14px var(--sans);text-align:center}.es-feito small{display:block;font:400 12.5px var(--sans);color:#4f8a66;margin-top:3px}.es-feito a{color:#1f6b3d;text-decoration:underline}
 .es-acts{display:flex;gap:8px;margin:0 10px 10px;flex-wrap:wrap}.es-wa{display:flex;align-items:center;justify-content:center;gap:6px;flex:1 1 100%;border:0;border-radius:20px;padding:14px;font:600 15px var(--sans);background:#25d366;color:#fff;text-decoration:none}.es-wa.sem{background:#f6efe7;color:var(--wine);border:1.5px dashed #d9b99b}.es-acts .es-go{margin:0;flex:1;width:auto}.es-nt{border:0;border-radius:20px;padding:14px 16px;font:600 14px var(--sans);background:#f3e4d3;color:var(--wine)}
 .es-card.novo{box-shadow:0 0 0 2px var(--gold),var(--shadow)}
 .pt-chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
@@ -1262,9 +1263,15 @@ const ETAPAS = [
 function ctxDe(e){ const its=(e.itens||[]).map(i=>`• ${i.qtd||1}× ${i.nome}`).join('\n'); return {nome:e.cliente,itens:its,total:e.total||0,sinal:e.sinal||0,hora:horaDe(e)||'',entrega:e.entrega}; }
 const telOk = t => String(t||'').replace(/\D/g,'').length>=10;
 const WA_ETAPA = {sinal:['confirmacao','💬 Mandar confirmação + Pix'], producao:['sinalok','💬 Avisar que o sinal caiu'], pronta:['pronto','💬 Avisar que está pronto'], ok:['obrigado','💬 Agradecer']};
+const WA_FEITO = {confirmacao:'Confirmação enviada · aguardando o Pix', sinalok:'Cliente avisada do sinal', pronto:'Cliente avisada que está pronto', obrigado:'Agradecimento enviado'};
+const hhmm = iso => { try{ const d = new Date(iso); return (d.toDateString()===new Date().toDateString() ? 'hoje' : d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}))+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }catch(x){ return ''; } };
 function waBtn(e){ const et = etapa(e), m = WA_ETAPA[et] || WA_ETAPA.sinal;
   if(!telOk(e.tel)) return `<button class="es-wa sem" data-act="enc" data-id="${e.id}">📱 Falta o WhatsApp da cliente · tocar pra colocar</button>`;
-  return `<a class="es-wa" href="${wa(e.tel,fillMsg(m[0],ctxDe(e)))}" target="_blank" rel="noopener">${m[1]}</a>`; }
+  const feito = (e.enviados||{})[m[0]], href = wa(e.tel,fillMsg(m[0],ctxDe(e)));
+  if(feito) return `<div class="es-feito">✅ ${WA_FEITO[m[0]]}<small>${hhmm(feito)} · <a href="${href}" target="_blank" rel="noopener" data-wa="${e.id}" data-k="${m[0]}">mandar de novo</a></small></div>`;
+  return `<a class="es-wa" href="${href}" target="_blank" rel="noopener" data-wa="${e.id}" data-k="${m[0]}">${m[1]}</a>`; }
+async function marcarEnviada(id,k){ const e = S.enc[id]; if(!e) return; const n = {...clone(e), enviados:{...(e.enviados||{}), [k]:new Date().toISOString()}, visto:true}; S.enc[id] = n; try{ await put('encomendas',id,n); }catch(x){} later(); }
+document.addEventListener('click',ev=>{ const a = ev.target.closest && ev.target.closest('a[data-wa]'); if(!a) return; const id = a.dataset.wa, k = a.dataset.k; setTimeout(()=>marcarEnviada(id,k),400); });
 function estCard(e){
   const et = etapa(e), atras = e.entrega && e.entrega < hoje(), n = ordemPedido(e), rec = Math.max(0,(e.total||0)-(e.sinal||0));
   const its = (e.itens||[]).map(i=>(i.qtd>1?i.qtd+'× ':'')+esc(i.nome.replace(/^Caixa /,''))).join('<br>');
@@ -1299,12 +1306,13 @@ function estLista(){
   let todos = Object.values(S.enc);
   if(q) todos = todos.filter(e=>norm([e.cliente,e.num,(e.itens||[]).map(i=>i.nome).join(' '),e.obs,e.cartao].join(' ')).includes(q));
   if(F.d) todos = todos.filter(e=>e.entrega===F.d);
-  const grupos = [['sinal','Aguardando sinal','Mande a chave Pix e toque em “Recebi o sinal” quando cair.'],['producao','Em produção','Sinal pago. Quando terminar, toque em “Ficou pronto”.'],['pronta','Pronto para retirar','Avise a cliente. Na retirada, toque em “Entregue”.'],['ok','Entregue','Pedidos que já saíram.']]
-    .filter(g=>F.st==='todos'||F.st===g[0]);
+  const grupos = [['confirmar','Falta mandar a confirmação','Toque no botão verde pra mandar a confirmação com o Pix.','sinal'],['pix','Confirmação enviada · aguardando o Pix','Já mandou. Quando o Pix cair, toque em “Recebi o sinal”.','sinal'],['producao','Em produção','Sinal pago. Quando terminar, toque em “Ficou pronto”.'],['pronta','Pronto para retirar','Avise a cliente. Na retirada, toque em “Entregue”.'],['ok','Entregue','Pedidos que já saíram.']]
+    .filter(g=>F.st==='todos'||F.st===g[0]||F.st===g[3]);
+  const sub = e => etapa(e)!=='sinal' ? etapa(e) : ((e.enviados||{}).confirmacao ? 'pix' : 'confirmar');
   const ord = (x,y)=>String(x.entrega+(x.hora||'')).localeCompare(String(y.entrega+(y.hora||'')));
   let total = 0;
-  const html = grupos.map(([k,t,s])=>{ let l = todos.filter(e=>etapa(e)===k).sort(ord); if(k==='ok') l = l.reverse().slice(0, F.st==='ok'?50:6); total += l.length;
-    return `<section class="col"><div class="col-h"><span class="dot d-${k}"></span>${t}<em>${l.length}</em></div><div class="es-sub" style="margin:-4px 6px 10px">${s}</div>${l.length?l.map(estCard).join(''):'<div class="vazio">Nenhum pedido aqui.</div>'}</section>`; }).join('');
+  const html = grupos.map(([k,t,s,dk])=>{ let l = todos.filter(e=>sub(e)===k).sort(ord); if(k==='ok') l = l.reverse().slice(0, F.st==='ok'?50:6); total += l.length;
+    return `<section class="col"><div class="col-h"><span class="dot d-${dk||k}"></span>${t}<em>${l.length}</em></div><div class="es-sub" style="margin:-4px 6px 10px">${s}</div>${l.length?l.map(estCard).join(''):'<div class="vazio">Nenhum pedido aqui.</div>'}</section>`; }).join('');
   setTimeout(()=>{ const c = $('#f-cnt'); if(c) c.textContent = total+' encomenda(s)'; },0);
   return html;
 }
@@ -1632,7 +1640,7 @@ function fillMsg(k, ctx={}){
 function wa(tel, text){ const dig = String(tel||'').replace(/\D/g,''); const num = dig.length>=10 ? (dig.length<=11?'55'+dig:dig) : ''; return 'https://wa.me/'+num+'?text='+encodeURIComponent(text); }
 const msgLink = (k,tel,ctx,sub) => `<a href="${wa(tel,fillMsg(k,ctx))}" target="_blank" rel="noopener" data-msg="${k}"><div><b>${MSG_PAD[k].n}</b>${sub?`<small>${sub}</small>`:''}</div><span class="go">ABRIR ›</span></a>`;
 function encCtx(){ const its = Object.entries(ed.q||{}).filter(([id,q])=>q>0&&S.prod[id]).map(([id,q])=>`• ${q}× ${S.prod[id].nome}`).concat((ed.cx||[]).filter(i=>i.qtd>0).map(i=>`• ${i.qtd}× ${i.nome}`)).join('\n'); return {nome:ed.cliente,itens:its,total:encTotal(),sinal:ed.sinal||0,hora:ed.hora||'',entrega:ed.entrega}; }
-function encMsgs(){ const c = encCtx(), t = ed.tel; if(!telOk(t)) return `<div class="hint" style="padding:14px;border-radius:18px;background:#f6efe7;color:var(--wine)">📱 Coloque o WhatsApp da cliente no campo acima. Aí as mensagens abrem direto na conversa dela, sem precisar salvar o contato.</div>`; return ['confirmacao','sinalok','pronto','obrigado','sinal'].map(k=>msgLink(k,t,c)).join(''); }
+function encMsgs(){ const c = encCtx(), t = ed.tel; if(!telOk(t)) return `<div class="hint" style="padding:14px;border-radius:18px;background:#f6efe7;color:var(--wine)">📱 Coloque o WhatsApp da cliente no campo acima. Aí as mensagens abrem direto na conversa dela, sem precisar salvar o contato.</div>`; return ['confirmacao','sinalok','pronto','obrigado','sinal'].map(k=>{ const h = msgLink(k,t,c), f = (ed.enviados||{})[k]; return (S.enc[ed.id] ? h.replace('data-msg=',`data-wa="${ed.id}" data-k="${k}" data-msg=`) : h).replace('<span class="go">ABRIR ›</span>', f ? '<span class="go" style="color:#1f6b3d">✓ ENVIADA</span>' : '<span class="go">ABRIR ›</span>'); }).join(''); }
 function msgsSheet(){
   sheet('Mensagens prontas', `
     <div class="note">Use {nome}, {itens}, {total}, {sinal50}, {restante}, {entrega} e {pix}. O app troca pelos dados do cliente.</div>
