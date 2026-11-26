@@ -377,7 +377,7 @@ footer{background:var(--vinho-fundo);border-top:1px solid rgba(201,147,90,.18);p
       <div class="dados">
         <span class="rotulo">Seus dados</span>
         <label>Nome<input id="f-nome" autocomplete="name" placeholder="Como podemos te chamar?"></label>
-        <label>WhatsApp <small style="opacity:.7">(opcional)</small><input id="f-tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="(27) 99999-9999"></label>
+        <label>Seu WhatsApp <small style="opacity:.7">(pra gente te avisar)</small><input id="f-tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="(27) 99999-9999"></label>
         <div class="d2"><label>Data de retirada<input id="f-data" type="date"></label><label>Horário<input id="f-hora" type="time"></label></div>
         <label class="ck"><input id="f-pres" type="checkbox"> É para presente</label>
         <label id="l-cart" style="display:none">Mensagem do cartão<input id="f-cart" maxlength="140" placeholder="Ex.: Feliz aniversário, mãe!"></label>
@@ -721,7 +721,11 @@ window.addEventListener('scroll',function(){var t=document.querySelector('.topo'
   }
   document.addEventListener('click', function(e){
     var a = e.target.closest && e.target.closest('#pedir'); if (!a) return;
-    e.preventDefault(); if (a.dataset.enviando) return; a.dataset.enviando = '1';
+    e.preventDefault(); if (a.dataset.enviando) return;
+    var tf = document.getElementById('f-tel'), dg = (tf.value||'').replace(/\D/g,'');
+    if (dg.length < 10) { tf.style.boxShadow = '0 0 0 2px #c0392b'; tf.placeholder = 'Coloque seu WhatsApp com DDD'; tf.scrollIntoView({behavior:'smooth', block:'center'}); setTimeout(function(){ tf.focus(); }, 400); return; }
+    tf.style.boxShadow = '';
+    a.dataset.enviando = '1';
     var href = a.href, txt = a.innerHTML; a.innerHTML = 'Enviando pedido…';
     salvarNoApp().then(function(){ a.innerHTML = txt; delete a.dataset.enviando; window.location.href = href; });
   }, true);
