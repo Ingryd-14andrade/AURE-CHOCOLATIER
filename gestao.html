@@ -566,17 +566,36 @@ async function importarSeed(){
 /* pedidos que chegam do cardápio */
 let primeiraCarga = true;
 function chegou(snap){
-  if(primeiraCarga){ primeiraCarga = false; snap.docs.forEach(x=>arrumarPedido(x.id, x.data())); return; }
+  if(primeiraCarga){ primeiraCarga = false; const ds = snap.docs.map(x=>[x.id,x.data()]).sort((a,b)=>String(a[1].criado||'').localeCompare(String(b[1].criado||''))); ds.forEach(([id,e])=>{ filaPed = filaPed.then(()=>arrumarPedido(id,e)); }); filaPed = filaPed.then(juntarExistentes); return; }
   snap.docChanges().forEach(ch=>{ if(ch.type!=='added' || ch.doc.metadata.hasPendingWrites) return; const e = ch.doc.data();
     if(e.origem==='cardapio'){ toast('🍫 Novo pedido de '+String(e.cliente||'cliente').split(' ')[0]); tocarSino(); try{ navigator.vibrate && navigator.vibrate([120,60,120]); }catch(_){} UI.novo = ch.doc.id; }
-    arrumarPedido(ch.doc.id, e); });
+    const id = ch.doc.id; filaPed = filaPed.then(()=>arrumarPedido(id, e)); });
+}
+let filaPed = Promise.resolve();
+const chaveJunta = e => (e && e.entrega && telOk(e.tel)) ? dig(e.tel).slice(-8)+'|'+e.entrega+'|'+(e.hora||'') : null;
+const podeJuntar = e => e && e.status!=='entregue' && !((e.sinal||0)>0);
+function juntarDocs(a, b){ // b entra dentro de a
+  const cart = [a.cartao,b.cartao].filter(Boolean).filter((v,i,arr)=>arr.indexOf(v)===i).join(' / ').slice(0,280);
+  return {...a, itens:[...(a.itens||[]),...(b.itens||[])], total:Math.round(((a.total||0)+(b.total||0))*100)/100, presente:!!(a.presente||b.presente), cartao:cart, cliente:a.cliente||b.cliente, visto:false, juntou:(a.juntou||1)+(b.juntou||1), conferido:true};
+}
+async function juntarExistentes(){
+  const grupos = {};
+  Object.values(S.enc).filter(e=>e.origem==='cardapio' && podeJuntar(e) && chaveJunta(e)).forEach(e=>{ (grupos[chaveJunta(e)] ||= []).push(e); });
+  for(const g of Object.values(grupos)){ if(g.length<2) continue;
+    g.sort((x,y)=>(x.num||1e9)-(y.num||1e9) || String(x.criado||'').localeCompare(String(y.criado||'')));
+    let base = g[0]; for(const o of g.slice(1)) base = juntarDocs(base, o);
+    try{ await put('encomendas', base.id, base); S.enc[base.id] = base; for(const o of g.slice(1)){ await del('encomendas', o.id); delete S.enc[o.id]; } toast('🔗 Juntei '+g.length+' pedidos de '+String(base.cliente||'').split(' ')[0]+' num só'); }catch(err){}
+  }
 }
 const arrumando = new Set();
 async function arrumarPedido(id, e){ // completa custo da caixa e liga a cliente
   if(e.origem!=='cardapio' || e.conferido || arrumando.has(id)) return; arrumando.add(id);
   try{
     const itens = (e.itens||[]).map(i=>{ if(i.tipo!=='cx') return i; const r = cxCalc({f:i.f,q:i.q,n:i.n,s:i.s,c:i.c,mix:i.mix||[]}); return {...i,custo:r.custo||0,nome:cxNome({f:i.f,q:i.q,n:i.n,s:i.s,c:i.c,mix:i.mix||[]})}; });
-    const b = {...e, id, itens, conferido:true, num:e.num||proxNum()}; b.clienteId = await upsertCli(b); await put('encomendas', id, b);
+    const b0 = {...e, id, itens, conferido:true};
+    const k = chaveJunta(b0), alvo = (k && podeJuntar(b0)) ? Object.values(S.enc).find(x=>x.id!==id && x.conferido && podeJuntar(x) && chaveJunta(x)===k) : null;
+    if(alvo){ const m = juntarDocs(alvo, b0); await put('encomendas', alvo.id, m); S.enc[alvo.id] = m; await del('encomendas', id); delete S.enc[id]; if(UI.novo===id) UI.novo = alvo.id; toast('🔗 Juntei o pedido novo de '+String(m.cliente||'').split(' ')[0]+' com o que já existia'); later(); return; }
+    const b = {...b0, num:e.num||proxNum()}; b.clienteId = await upsertCli(b); await put('encomendas', id, b); S.enc[id] = {...S.enc[id], ...b};
   }catch(err){ arrumando.delete(id); }
 }
 /* login */

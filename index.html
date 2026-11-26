@@ -132,6 +132,15 @@ section{position:relative}
 .recibo .sinal{margin:18px 0 22px;padding-top:16px;border-top:1px solid rgba(201,147,90,.25);font-size:15px;color:#E4CDBE}
 .recibo .sinal b{color:var(--ouro-claro);font-weight:400}
 .recibo .btn{width:100%;justify-content:center;font-size:16px;padding:18px}
+.add-cx{width:100%;margin:0 0 18px;padding:15px;border-radius:999px;border:1px solid rgba(201,147,90,.6);background:transparent;color:var(--ouro-claro);font-family:var(--f-texto);font-size:15px;letter-spacing:.04em;cursor:pointer;transition:background .4s}
+.add-cx:hover{background:rgba(201,147,90,.12)}.add-cx:disabled{opacity:.45;cursor:default}
+.sacola{display:none;margin:0 0 20px;padding:16px 16px 6px;border-radius:22px;background:rgba(0,0,0,.22);border:1px solid rgba(201,147,90,.25)}
+.sacola.on{display:block}.sacola .rotulo{margin-bottom:10px}
+.sc-it{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-top:1px solid rgba(201,147,90,.15);color:#E4CDBE;font-size:14.5px;line-height:1.4}
+.sc-it:first-of-type{border-top:0}.sc-it .n{flex:1}.sc-it .n small{display:block;color:#b9998a;font-size:12.5px}
+.sc-it .v{color:var(--ouro-claro);white-space:nowrap}.sc-it .x{border:0;background:rgba(201,147,90,.15);color:#E4CDBE;width:28px;height:28px;border-radius:50%;cursor:pointer;flex:none;font-size:14px;line-height:28px;padding:0}
+.sc-it.agora{opacity:.85}.sc-it.agora .n small{color:var(--ouro-claro)}
+.sc-tot{display:flex;justify-content:space-between;padding:12px 0 10px;border-top:1px solid rgba(201,147,90,.35);color:#fff3e6;font-size:16px}.sc-tot b{color:var(--ouro-claro);font-weight:400}
 .tabela-bt{display:block;margin:22px auto 0;background:none;border:0;color:var(--ouro-claro);font-size:14px;letter-spacing:.08em;border-bottom:1px solid rgba(233,197,154,.4);padding-bottom:3px}
 .tabela{display:none;max-width:980px;margin:6vh auto 0;overflow-x:auto}
 .tabela.aberta{display:block}
@@ -359,7 +368,7 @@ footer{background:var(--vinho-fundo);border-top:1px solid rgba(201,147,90,.18);p
   <div class="sabores"><button class="sbi" data-sabor="Clássica"><span class="sn">01</span><span class="st"><b>Clássica</b><span class="gl">Ingredientes</span><span class="gr"><i>Castanha de caju</i><i>Amêndoa</i><i>Uva passa</i></span></span><span class="sp"><small>a partir de</small>R$ 13,90</span><span class="sa">→</span></button><button class="sbi" data-sabor="Avelã"><span class="sn">02</span><span class="st"><b>Avelã</b><span class="gl">Ingredientes</span><span class="gr"><i>Avelã</i><i>Nozes</i></span></span><span class="sp"><small>a partir de</small>R$ 14,90</span><span class="sa">→</span></button><button class="sbi" data-sabor="Tropical"><span class="sn">03</span><span class="st"><b>Tropical</b><span class="gl">Ingredientes</span><span class="gr"><i>Coco</i><i>Damasco</i><i>Castanha de caju</i></span></span><span class="sp"><small>a partir de</small>R$ 14,90</span><span class="sa">→</span></button><button class="sbi" data-sabor="Noir"><span class="sn">04</span><span class="st"><b>Noir</b><span class="gl">Ingredientes</span><span class="gr"><i>Amêndoa</i><i>Blueberry</i></span></span><span class="sp"><small>a partir de</small>R$ 14,90</span><span class="sa">→</span></button><button class="sbi" data-sabor="Brasil"><span class="sn">05</span><span class="st"><b>Brasil</b><span class="gl">Ingredientes</span><span class="gr"><i>Castanha-do-pará</i><i>Goji berry</i></span></span><span class="sp"><small>a partir de</small>R$ 13,90</span><span class="sa">→</span></button><button class="sbi" data-sabor="Pistache"><span class="sn">06</span><span class="st"><b>Pistache</b><span class="gl">Ingredientes</span><span class="gr"><i>Pistache</i><i>Castanha-do-pará</i><i>Blueberry</i></span></span><span class="sp"><small>a partir de</small>R$ 15,90</span><span class="sa">→</span></button><button class="sbi" data-sabor="Dourada"><span class="sn">07</span><span class="st"><b>Dourada</b><span class="gl">Ingredientes</span><span class="gr"><i>Damasco</i><i>Castanha de caju</i></span></span><span class="sp"><small>a partir de</small>R$ 14,90</span><span class="sa">→</span></button><button class="sbi" data-sabor="Mediterrânea"><span class="sn">08</span><span class="st"><b>Mediterrânea</b><span class="gl">Ingredientes</span><span class="gr"><i>Uva passa</i><i>Pistache</i><i>Nozes</i></span></span><span class="sp"><small>a partir de</small>R$ 14,90</span><span class="sa">→</span></button><button class="sbi monte-it" data-sabor="Monte o seu"><span class="sn">✦</span><span class="st"><b>Monte o seu</b><span class="gl">Você escolhe</span><span class="gr"><i>Até 4 grãos</i><i>Amendoim</i><i>Castanhas</i><i>Frutas secas</i><i>Pistache</i></span></span><span class="sp"><small>preço</small>na hora</span><span class="sa">→</span></button><button class="sbi sx" data-sabor="Sortida"><span class="sn">09</span><span class="st"><b>Sortida</b><span class="gl">Ingredientes</span><span class="gr"><i>Um de cada sabor da casa</i></span></span><span class="sp"><small>a partir de</small>R$ 25,90</span><span class="sa">→</span></button></div>
 </section>
 <section class="c6" id="monte" aria-label="Monte sua caixa">
-  <div class="cab"><span class="rotulo">Monte sua caixa</span><h2 class="serif">O preço aparece<br><em>na hora.</em></h2><p>Toque nas opções. O pedido vai pronto pro WhatsApp.</p></div>
+  <div class="cab"><span class="rotulo">Monte sua caixa</span><h2 class="serif">O preço aparece<br><em>na hora.</em></h2><p>Toque nas opções. Quer mais de um tipo, tipo barra e quadradinhos? Adicione à sacola e monte o próximo: vai tudo num pedido só.</p></div>
   <div class="monte">
     <div>
       <div class="grupo"><span class="rotulo">1 · Formato</span><div class="opcoes" id="g-fmt"><button class="op" data-f="q">Quadradinhos<small>≈ 19 g cada</small></button><button class="op" data-f="b">Barrinhas<small>≈ 20 g, embaladas uma a uma</small></button><button class="op" data-f="t">Barra 55 g<small>Tablete inteiro, com saquinho e etiqueta</small></button></div></div>
@@ -374,6 +383,8 @@ footer{background:var(--vinho-fundo);border-top:1px solid rgba(201,147,90,.18);p
       <div class="valor" id="valor">R$ 0</div>
       <div class="det" id="det"></div>
       <div class="sinal" id="sinal"></div>
+      <button class="add-cx" id="add-cx" type="button">+ Adicionar à sacola e escolher outra</button>
+      <div class="sacola" id="sacola"></div>
       <div class="dados">
         <span class="rotulo">Seus dados</span>
         <label>Nome<input id="f-nome" autocomplete="name" placeholder="Como podemos te chamar?"></label>
@@ -473,6 +484,29 @@ void main(){
     return Math.round(up90(mat*MIX.mk + st.q*MIX.mo[st.f])*100)/100;
   }
   function preco(){ if (st.s==='Monte o seu') return precoMix(); return st.q==='+' ? null : D.p[st.s+'|'+st.f+st.q+'|'+st.c]; }
+  var SAC = [], ADD = false, MAXI = 5;
+  function itemAtual(){
+    var p = preco(), mx = st.s==='Monte o seu';
+    var tam = st.q==='+' ? st.n+' '+nome(st.f,2) : (st.f==='t' && st.q===1) ? '1 barra de 55 g' : st.q+' '+nome(st.f,st.q);
+    var sab = mx ? 'Monte o seu ('+(st.mix.length?st.mix.join(', '):'grãos a combinar')+')' : st.s;
+    return {f:st.f, q:st.q, n:st.q==='+'?st.n:null, s:st.s, c:st.c, mix:mx?st.mix.slice():[], p:p||0, temP:!!p, tam:tam, sab:sab, ch:CHN[st.c]};
+  }
+  function itensPedido(){ return ADD ? SAC.slice() : SAC.concat([itemAtual()]); }
+  function desenhaSacola(){
+    var box = $('#sacola'), its = itensPedido();
+    if (!SAC.length){ box.classList.remove('on'); box.innerHTML = ''; }
+    else {
+      var tot = its.reduce(function(a,i){ return a+(i.p||0); },0), falta = its.some(function(i){ return !i.temP; });
+      box.innerHTML = '<span class="rotulo">Sua sacola · '+its.length+(its.length>1?' itens':' item')+'</span>'
+        + SAC.map(function(i,k){ return '<div class="sc-it"><div class="n">'+i.tam+'<small>'+i.sab+' · '+i.ch+'</small></div><div class="v">'+(i.temP?brl(i.p):'a confirmar')+'</div><button class="x" type="button" data-rm="'+k+'" aria-label="Tirar da sacola">✕</button></div>'; }).join('')
+        + (ADD ? '' : (function(i){ return '<div class="sc-it agora"><div class="n">'+i.tam+'<small>montando agora · entra no pedido</small></div><div class="v">'+(i.temP?brl(i.p):'a confirmar')+'</div></div>'; })(itemAtual()))
+        + '<div class="sc-tot"><span>Total</span><b>'+brl(tot)+(falta?' + a confirmar':'')+'</b></div>';
+      box.classList.add('on');
+    }
+    $('#add-cx').disabled = SAC.length >= MAXI;
+    $('#add-cx').textContent = SAC.length >= MAXI ? 'Máximo de '+MAXI+' itens por pedido' : (SAC.length ? '+ Adicionar à sacola e escolher mais uma' : '+ Adicionar à sacola e escolher outra');
+    var pd = $('#pedir'); if (pd && !pd.dataset.enviando) pd.innerHTML = (its.length>1 ? 'Pedir tudo ('+its.length+' itens) pelo WhatsApp' : 'Pedir pelo WhatsApp')+' <span class="seta">→</span>';
+  }
   function render(pulse){
     if (st.f==='t'){ if (st.q!==1 && st.q!==2) st.q = 1; if (st.s==='Sortida') st.q = 2; }
     else if (st.q===1 || st.q===2) st.q = 4;
@@ -497,22 +531,24 @@ void main(){
     var nomeC = ($('#f-nome').value||'').trim(), dataC = ($('#f-data').value||'').trim(), horaC = ($('#f-hora').value||'').trim(), pres = $('#f-pres').checked, telC = ($('#f-tel').value||'').trim(), cartC = ($('#f-cart').value||'').trim();
     $('#l-cart').style.display = pres ? '' : 'none';
     var fmtData = dataC ? dataC.split('-').reverse().join('/') : '';
+    var its = itensPedido(), totP = its.reduce(function(a,i){ return a+(i.p||0); },0), falta = its.some(function(i){ return !i.temP; });
     var msg = 'Olá, Aure! Quero fazer uma encomenda:\n\n'
-      + '• Caixa: '+tam+'\n'
-      + (mx ? '• Sabor: Monte o seu ('+(st.mix.length?st.mix.join(', '):'grãos a combinar')+')\n' : '• Sabor: '+st.s+'\n')
-      + '• Chocolate: '+ch+'\n'
-      + (p ? '• Valor: '+brl(p)+' (sinal de 50%: '+brl(p/2)+')\n' : '• Valor: a confirmar\n')
+      + its.map(function(i,k){ return (its.length>1?(k+1)+') ':'• ')+i.tam+' · '+i.sab+' · '+i.ch+' · '+(i.temP?brl(i.p):'valor a confirmar'); }).join('\n') + '\n'
+      + (totP ? '\nTotal: '+brl(totP)+(falta?' + itens a confirmar':'')+' (sinal de 50%: '+brl(totP/2)+')\n' : '\nValor: a confirmar\n')
       + '\nMeus dados:\n'
       + 'Nome: '+(nomeC||'')+'\n'
       + 'Data de retirada: '+(fmtData||'')+'\n'
       + 'Horário: '+(horaC||'')+'\n'
       + 'É para presente? '+(pres ? 'Sim. Mensagem do cartão: '+cartC : 'Não')+'\n';
     $('#pedir').href = 'https://wa.me/'+WHATS+'?text='+encodeURIComponent(msg);
-    PEDIDO = {cliente:nomeC||'', tel:telC, cartao:pres?cartC:'', entrega:dataC||'', hora:horaC||'', presente:pres, f:st.f, q:st.q, n:st.q==='+'?st.n:null, s:st.s, c:st.c, mix:mx?st.mix.slice():[], preco:p||0};
+    PEDIDO = {cliente:nomeC||'', tel:telC, cartao:pres?cartC:'', entrega:dataC||'', hora:horaC||'', presente:pres, itens:its, preco:totP||0};
+    desenhaSacola();
   }
   document.addEventListener('click', function(e){
     var b = e.target.closest('button'); if(!b) return;
     var d = b.dataset, mudou = false;
+    if (b.id==='add-cx'){ if (SAC.length>=MAXI) return; var it = itemAtual(); if (st.s==='Monte o seu' && !st.mix.length) return; SAC.push(it); ADD = true; render(false); var sc = $('#sacola'); sc.animate && sc.animate([{transform:'scale(.97)'},{transform:'scale(1)'}],{duration:300}); var al = $('#monte'); if (window.__lenis) window.__lenis.scrollTo(al,{duration:1.2}); else al.scrollIntoView({behavior:'smooth'}); return; }
+    if (d.rm !== undefined){ SAC.splice(+d.rm,1); if (!SAC.length) ADD = false; render(false); return; }
     if (d.f){ st.f = d.f; mudou = true; }
     if (d.q){ st.q = d.q==='+' ? '+' : +d.q; mudou = true; }
     if (d.c){ st.c = d.c; mudou = true; }
@@ -521,7 +557,7 @@ void main(){
     if (d.d){ st.n = Math.max(11, st.n + (+d.d)); mudou = true; }
     if (d.sabor){ st.s = d.sabor; render(true); var alvo = $('#monte'); if (window.__lenis) window.__lenis.scrollTo(alvo,{duration:1.8}); else alvo.scrollIntoView({behavior:'smooth'}); return; }
     if (b.id==='tabela-bt'){ var t=$('#tabela'); t.classList.toggle('aberta'); b.textContent = t.classList.contains('aberta') ? 'Fechar tabela' : 'Ver tabela completa de preços'; if (window.ScrollTrigger) ScrollTrigger.refresh(); return; }
-    if (mudou) render(true);
+    if (mudou){ ADD = false; render(true); }
   });
   render(false);
   ['f-nome','f-tel','f-data','f-hora','f-pres','f-cart'].forEach(function(id){ var el=document.getElementById(id); el.addEventListener('input',function(){render(false);}); el.addEventListener('change',function(){render(false);}); });
@@ -707,12 +743,15 @@ window.addEventListener('scroll',function(){var t=document.querySelector('.topo'
         if (!window.firebase || !PEDIDO || /^COLE/.test(FIREBASE.apiKey)) return ok(false);
         if (!firebase.apps.length) firebase.initializeApp(FIREBASE);
         var P = PEDIDO, CN = {'40':'40%','75':'75%','br':'branco'};
-        var n = P.q==='+' ? (P.n||12) : P.q;
-        var tam = P.f==='t' ? (n===1?'1 barra 55 g':'Caixa 2 barras 55 g') : 'Caixa '+n+' '+(P.f==='q'?'quadradinhos':'barrinhas');
-        var item = {tipo:'cx', nome: tam+' · '+(P.s==='Monte o seu' ? 'Monte o seu ('+(P.mix.join(', ')||'a combinar')+')' : P.s)+' · '+CN[P.c],
-          qtd:1, preco:P.preco||0, custo:0, f:P.f, q:P.q, n:P.n, s:P.s, c:P.c, mix:P.mix};
+        var itens = (P.itens||[]).slice(0,5).map(function(I){
+          var n = I.q==='+' ? (I.n||12) : I.q;
+          var tam = I.f==='t' ? (n===1?'1 barra 55 g':'Caixa 2 barras 55 g') : 'Caixa '+n+' '+(I.f==='q'?'quadradinhos':'barrinhas');
+          return {tipo:'cx', nome: tam+' · '+(I.s==='Monte o seu' ? 'Monte o seu ('+(I.mix.join(', ')||'a combinar')+')' : I.s)+' · '+CN[I.c],
+            qtd:1, preco:I.p||0, custo:0, f:I.f, q:I.q, n:I.n, s:I.s, c:I.c, mix:I.mix}; });
+        if (!itens.length) return ok(false);
+        var totalP = Math.round(itens.reduce(function(a,i){ return a+(i.preco||0); },0)*100)/100;
         var doc = {cliente:(P.cliente||'Cliente do cardápio').slice(0,80), tel:String(P.tel||'').slice(0,20), presente:!!P.presente, cartao:String(P.cartao||'').slice(0,140), entrega:P.entrega||'', hora:P.hora||'',
-          itens:[item], total:P.preco||0, pag:'Pix', sinal:0, obs:'',
+          itens:itens, total:totalP, pag:'Pix', sinal:0, obs:'',
           status:'aberta', origem:'cardapio', criado:new Date().toISOString()};
         var t = setTimeout(function(){ ok(false); }, 3500);
         firebase.firestore().collection('encomendas').add(doc).then(function(){ clearTimeout(t); ok(true); }, function(){ clearTimeout(t); ok(false); });
