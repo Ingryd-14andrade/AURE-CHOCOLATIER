@@ -542,6 +542,7 @@ async function boot(){
   if(!ok){ clearTimeout(timer); mode='local'; loadLocal(); if(!Object.keys(S.ing).length){ for(const x of SEED.ingredientes){ const {id,...r} = x; S.ing[id] = {id,...r}; } for(const x of SEED.compras){ const {id,...r} = x; S.comp[id] = {id,...r}; } S.cfg = {...SEED['config/geral'], ...S.cfg}; } later(); return; }
   if(!firebase.apps.length) firebase.initializeApp(FIREBASE);
   const auth = firebase.auth();
+  try{ await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); }catch(e){}
   const user = await new Promise(res=>{ const off = auth.onAuthStateChanged(u=>{ if(u){ off(); res(u); } else { clearTimeout(timer); telaLogin(); } }); });
   fecharLogin();
   const d = firebase.firestore();
@@ -604,12 +605,14 @@ function telaLogin(){
   if($('#login')) return;
   const el = document.createElement('div'); el.id = 'login';
   el.innerHTML = `<form class="lg-box" autocomplete="on"><div class="lg-logo">${POD}</div><h1>AURE</h1><p>CHOCOLATIER</p>
-    <input id="lg-mail" type="email" placeholder="seu e-mail" autocomplete="username" required>
-    <input id="lg-pass" type="password" placeholder="senha" autocomplete="current-password" required>
+    <input id="lg-mail" name="email" type="email" placeholder="seu e-mail" autocomplete="username" autocapitalize="none" required>
+    <input id="lg-pass" name="password" type="password" placeholder="senha" autocomplete="current-password" required>
+    <div style="font:400 12.5px var(--sans);color:#9a7d6f;margin:4px 0 10px">Você só entra uma vez neste celular. No iPhone, toque em “Salvar senha” quando aparecer: da próxima vez é só usar o Face ID.</div>
     <button class="btn p" type="submit">ENTRAR</button><div id="lg-err"></div></form>`;
   document.body.appendChild(el);
   el.querySelector('form').addEventListener('submit', async ev=>{ ev.preventDefault(); const er = $('#lg-err'); er.textContent = 'entrando…';
-    try{ await firebase.auth().signInWithEmailAndPassword($('#lg-mail').value.trim(), $('#lg-pass').value); er.textContent = ''; }
+    try{ const em = $('#lg-mail').value.trim(), pw = $('#lg-pass').value; await firebase.auth().signInWithEmailAndPassword(em, pw); er.textContent = '';
+      try{ if(window.PasswordCredential) await navigator.credentials.store(new PasswordCredential({id:em, password:pw, name:em})); }catch(_){} }
     catch(x){ er.textContent = /password|credential|user/.test(x.code||'') ? 'E-mail ou senha não conferem' : 'Não consegui entrar. Verifique a internet.'; } });
 }
 function fecharLogin(){ const el = $('#login'); if(el) el.remove(); }
