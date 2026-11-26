@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aure Chocolatier · Cardápio</title>
+<style>
+@font-face{font-family:Cinzel;src:url(cinzel.ttf);font-weight:400 900;font-display:swap}
+@font-face{font-family:"Cormorant Garamond";src:url(cormorant.ttf);font-weight:300 700;font-display:swap}
+@font-face{font-family:"Cormorant Garamond";src:url(cormorant-italic.ttf);font-weight:300 700;font-style:italic;font-display:swap}
+@font-face{font-family:Jost;src:url(jost.ttf);font-weight:100 900;font-display:swap}
+:root{
+  --vinho:#4A0A12; --vinho-fundo:#1E0407; --vinho-medio:#2E070C; --vinho-claro:#6B1420;
+  --ouro:#C9935A; --ouro-claro:#E9C59A; --creme:#F3E4CF; --texto:#F6EBDD; --suave:#BFA294; --tinta:#3A0A10;
+  --f-marca:"Cinzel",Georgia,serif; --f-titulo:"Cormorant Garamond",Georgia,serif; --f-texto:"Jost",system-ui,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1); --margem:clamp(20px,5vw,80px); --raio:22px;
+  --ouro-grad:linear-gradient(100deg,#9C6A35 0%,#E9C59A 28%,#C9935A 48%,#F4DDB8 62%,#A8733E 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{background:var(--vinho-fundo)}
+body{font-family:var(--f-texto);font-weight:300;color:var(--texto);background:var(--vinho-fundo);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body.carregando{overflow:hidden}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer}
+section{position:relative}
+::selection{background:var(--ouro);color:var(--vinho-fundo)}
+.grao{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:.06;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.pre{position:fixed;inset:0;z-index:100;background:var(--vinho-fundo);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+.pre .num{font-family:var(--f-titulo);font-style:italic;font-weight:300;font-size:clamp(70px,12vw,150px);line-height:1;background:var(--ouro-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pre .rot{font-family:var(--f-marca);font-size:11px;letter-spacing:.5em;color:var(--suave)}
+.pre .barra{width:140px;height:1px;background:rgba(201,147,90,.2)}
+.pre .barra i{display:block;height:100%;background:var(--ouro);transform-origin:left;transform:scaleX(0)}
+.cursor{position:fixed;left:0;top:0;z-index:95;pointer-events:none;width:44px;height:44px;margin:-22px 0 0 -22px;border:1px solid rgba(233,197,154,.55);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--f-marca);font-size:9px;letter-spacing:.2em;color:var(--vinho-fundo);transition:width .4s var(--ease),height .4s var(--ease),margin .4s var(--ease),background .4s,border-color .4s}
+.cursor.ativo{width:86px;height:86px;margin:-43px 0 0 -43px;background:var(--ouro-claro);border-color:transparent}
+.cursor span{opacity:0;transition:opacity .3s}.cursor.ativo span{opacity:1}
+.ponto{position:fixed;left:0;top:0;z-index:96;pointer-events:none;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:var(--ouro-claro)}
+@media (hover:none){.cursor,.ponto,.grao{display:none}}
+.topo{position:fixed;inset:0 0 auto 0;z-index:70;display:flex;justify-content:space-between;align-items:center;padding:20px var(--margem)}
+.marca{text-align:center;line-height:1}
+.marca b{font-family:var(--f-marca);font-weight:500;font-size:20px;letter-spacing:.1em;background:var(--ouro-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.marca small{display:block;font-family:var(--f-marca);font-size:7.5px;letter-spacing:.5em;color:var(--ouro);margin-top:5px;padding-left:.5em}
+.btn{display:inline-flex;align-items:center;gap:12px;font-family:var(--f-texto);font-weight:400;font-size:14px;letter-spacing:.06em;color:var(--vinho-fundo);background:var(--ouro-grad);background-size:200% 100%;padding:15px 28px;border-radius:999px;border:0;cursor:pointer;transition:background-position .8s var(--ease),box-shadow .5s;will-change:transform}
+.btn:hover{background-position:100% 0;box-shadow:0 14px 40px -12px rgba(233,197,154,.55)}
+.btn .seta{display:inline-block;transition:transform .5s var(--ease)}.btn:hover .seta{transform:translateX(4px)}
+.btn.vidro{background:rgba(30,4,7,.78);color:var(--ouro-claro);border:1px solid rgba(233,197,154,.35);padding:11px 20px;font-size:13px}
+.fita{position:fixed;left:clamp(8px,1.6vw,24px);top:0;bottom:0;width:1px;z-index:65;background:rgba(201,147,90,.12);pointer-events:none}
+.fita i{position:absolute;inset:0;background:linear-gradient(var(--ouro-claro),var(--ouro));transform-origin:top;transform:scaleY(0)}
+.rotulo{font-family:var(--f-marca);font-size:11px;letter-spacing:.42em;color:var(--ouro);text-transform:uppercase}
+.serif{font-family:var(--f-titulo);font-weight:300;line-height:.98;letter-spacing:-.015em}
+.serif em{font-style:italic;color:var(--ouro-claro)}
+.mask{display:block;overflow:hidden;padding-bottom:.08em}.mask>span{display:block;will-change:transform}
+.foto{position:relative;overflow:hidden;border-radius:var(--raio)}
+.foto img{width:100%;height:100%;object-fit:cover;will-change:transform}
+/* CENA 1 */
+.c1{height:100vh;height:100svh;position:relative;overflow:hidden;background:#140304}
+#choco{position:absolute;inset:0;width:100%;height:100%;display:block}
+.c1 .veu{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 40%,transparent 35%,rgba(20,3,4,.75) 100%),linear-gradient(transparent 55%,rgba(20,3,4,.85));pointer-events:none}
+.c1 .nome{position:absolute;left:0;right:0;top:50%;transform:translateY(-58%);text-align:center;pointer-events:none}
+.c1 .nome h1{font-family:var(--f-marca);font-weight:400;font-size:clamp(84px,25vw,420px);line-height:.9;letter-spacing:.02em;display:flex;justify-content:center;overflow:hidden;padding:0 0 .04em}
+.c1 .nome h1 span{display:inline-block;padding-top:.24em;background:var(--ouro-grad);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;will-change:transform}
+.c1 .nome .sub{font-family:var(--f-marca);font-size:clamp(10px,1.2vw,15px);letter-spacing:1.1em;padding-left:1.1em;color:var(--ouro-claro);margin-top:clamp(4px,1vw,14px)}
+.c1 .base{position:absolute;left:var(--margem);right:var(--margem);bottom:clamp(28px,7vh,72px);display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap}
+.c1 .frase{font-family:var(--f-titulo);font-style:italic;font-weight:300;font-size:clamp(26px,3.2vw,44px);line-height:1.1;max-width:15ch}
+.c1 .frase .rotulo{display:block;font-style:normal;margin-bottom:14px}
+.c1 .acao{display:flex;flex-direction:column;align-items:flex-end;gap:16px}
+.c1 .rolar{font-family:var(--f-marca);font-size:10px;letter-spacing:.4em;color:var(--suave);display:flex;align-items:center;gap:12px}
+.c1 .rolar i{display:block;width:44px;height:1px;background:var(--ouro);transform-origin:left;animation:linha 2.2s var(--ease) infinite}
+@keyframes linha{0%{transform:scaleX(0)}50%{transform:scaleX(1);transform-origin:left}51%{transform-origin:right}100%{transform:scaleX(0);transform-origin:right}}
+/* CENA 2 */
+.c2{background:var(--vinho-fundo);padding:22vh var(--margem) 16vh}
+.c2 .rotulo{display:block;margin-bottom:5vh}
+.c2 .manifesto{font-family:var(--f-titulo);font-weight:300;font-size:clamp(34px,5.4vw,84px);line-height:1.08;letter-spacing:-.01em;max-width:18ch}
+.c2 .manifesto .p{opacity:.14}
+.c2 .manifesto em{font-style:italic;color:var(--ouro-claro)}
+.faixa{background:var(--vinho);padding:3.2vh 0;overflow:hidden;white-space:nowrap;border-block:1px solid rgba(201,147,90,.25)}
+.faixa .trilho{display:inline-flex;gap:3vw;will-change:transform}
+.faixa span{font-family:var(--f-marca);font-size:clamp(28px,4.4vw,64px);letter-spacing:.12em;color:transparent;-webkit-text-stroke:1px rgba(233,197,154,.65)}
+.faixa span.cheio{color:var(--ouro-claro);-webkit-text-stroke:0}
+/* CENA 4 — protagonista */
+.c4{height:100vh;height:100svh;background:radial-gradient(80% 70% at 50% 50%,#3a0910 0%,#140305 100%);overflow:hidden}
+.c4 .halo{position:absolute;left:50%;top:50%;width:90vmin;height:90vmin;margin:-45vmin 0 0 -45vmin;border-radius:50%;background:radial-gradient(circle,rgba(233,197,154,.22),transparent 65%);opacity:0}
+.c4 .palco{position:absolute;left:50%;top:50%;width:min(52vh,78vw);aspect-ratio:.6;transform:translate(-50%,-50%)}
+.c4 .aberta{position:absolute;inset:0;border-radius:18px;overflow:hidden;box-shadow:0 40px 70px -30px rgba(0,0,0,.8)}
+.c4 img{width:100%;height:100%;object-fit:cover}
+.c4 .luz{position:absolute;inset:0;z-index:3;border-radius:18px;background:linear-gradient(105deg,transparent 30%,rgba(255,235,205,.25) 48%,transparent 66%);transform:translateX(-120%);pointer-events:none}
+.c4 canvas{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none}
+.c4 .frase{position:absolute;z-index:5;font-family:var(--f-titulo);font-weight:300;font-size:clamp(40px,6.8vw,110px);line-height:.95;opacity:0;white-space:nowrap;text-shadow:0 6px 30px rgba(20,3,4,.7)}
+.c4 .frase em{font-style:italic;background:var(--ouro-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.c4 .f1{left:var(--margem);top:16vh}.c4 .f2{right:var(--margem);top:44vh;text-align:right}.c4 .f3{left:var(--margem);bottom:12vh}
+.c4 .topo-cena{position:absolute;top:13vh;left:0;right:0;text-align:center;z-index:5}
+.c4 .zoom{position:absolute;inset:0;z-index:8;background:var(--creme);clip-path:circle(0% at 50% 56%)}
+/* CENA 5 — sabores deslizando */
+.c5{height:100vh;height:100svh;background:var(--creme);color:var(--tinta);overflow:hidden;display:flex;flex-direction:column;justify-content:center}
+.c5 .cab{padding:0 var(--margem) 0 var(--margem);margin-bottom:4vh;display:flex;justify-content:space-between;align-items:end;gap:20px}
+.c5 .cab .rotulo{color:#9a6a3f}
+.c5 h2{font-size:clamp(44px,6.6vw,104px)}.c5 h2 em{color:#9a6a3f}
+.c5 .contador{font-family:var(--f-titulo);font-style:italic;font-size:clamp(22px,2.4vw,34px);color:#9a6a3f}
+.c5 .trilho{display:flex;gap:clamp(16px,2.4vw,36px);padding:0 var(--margem) 0 var(--margem);width:max-content;align-items:flex-start}
+.cartao{width:clamp(250px,25vw,360px);flex:none}
+.cartao:nth-child(even){margin-top:6vh}
+.cartao .foto{aspect-ratio:4/4.4;margin-bottom:18px;box-shadow:0 30px 60px -34px rgba(58,10,16,.55)}
+.cartao .foto img{transform:scale(1.25)}
+.cartao .n{font-family:var(--f-marca);font-size:10px;letter-spacing:.3em;color:#9a6a3f}
+.cartao h3{font-family:var(--f-titulo);font-weight:400;font-size:36px;line-height:1.05;margin:6px 0 6px}
+.cartao p{font-size:15px;line-height:1.5;color:#6d4a3f;max-width:30ch}
+.cartao .preco{display:inline-block;margin-top:12px;font-family:var(--f-marca);font-size:10.5px;letter-spacing:.16em;color:var(--vinho);border-bottom:1px solid rgba(74,10,18,.3);padding-bottom:4px}
+.cartao .btn{margin-top:14px;background:var(--vinho);color:var(--creme);padding:12px 20px;font-size:13px}
+.cartao.sx .foto{box-shadow:0 0 0 2px var(--ouro),0 30px 60px -34px rgba(58,10,16,.55)}
+.cartao.sx h3{background:linear-gradient(100deg,#7A4A22,#C9935A,#7A4A22);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* CENA 6 — monte sua caixa */
+.c6{background:linear-gradient(180deg,#2A060C,#3A0A12);padding:16vh var(--margem) 14vh var(--margem)}
+.c6 .cab{text-align:center;margin-bottom:6vh}
+.c6 h2{font-size:clamp(46px,7vw,110px);margin-top:18px}
+.c6 .cab p{color:#E4CDBE;font-size:17px;margin-top:16px}
+.monte{max-width:980px;margin:0 auto;display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(20px,4vw,56px);align-items:start}
+.grupo{margin-bottom:28px}
+.grupo .rotulo{display:block;margin-bottom:14px;font-size:12.5px;color:var(--ouro-claro)}
+.opcoes{display:flex;flex-wrap:wrap;gap:10px}
+.op{border:1px solid rgba(233,197,154,.45);background:rgba(255,240,225,.08);border-radius:999px;padding:14px 22px;font-size:16px;font-weight:400;color:#FFF6EC;transition:background .4s var(--ease),border-color .4s,color .4s,transform .4s var(--ease)}
+.op small{display:block;font-size:12.5px;color:#E4CDBE;letter-spacing:.02em;margin-top:2px}
+.op:hover{border-color:rgba(233,197,154,.7)}
+.op.on{background:var(--ouro-grad);color:var(--vinho-fundo);border-color:transparent;transform:translateY(-2px);box-shadow:0 12px 30px -14px rgba(233,197,154,.6)}
+.op.on small{color:var(--vinho)}
+.op:disabled{opacity:.35;pointer-events:none}
+.op.num{min-width:64px;text-align:center;font-family:var(--f-titulo);font-size:24px;font-weight:500;padding:10px 18px}
+.op.sab{border-radius:20px;text-align:left;font-family:var(--f-titulo);font-size:22px;font-weight:500;line-height:1.1;padding:14px 20px}.op.sab small{font-family:var(--f-texto);font-weight:300}
+.qtd{display:none;align-items:center;gap:12px;margin-top:12px}
+.qtd button{width:44px;height:44px;border-radius:50%;border:1px solid rgba(233,197,154,.4);background:transparent;color:var(--ouro-claro);font-size:22px}
+.qtd b{font-family:var(--f-titulo);font-size:34px;min-width:2ch;text-align:center;font-weight:500}
+.recibo{position:sticky;top:90px;border:1px solid rgba(201,147,90,.35);border-radius:30px;padding:30px;background:linear-gradient(160deg,rgba(74,10,18,.85),rgba(30,4,7,.95));box-shadow:0 40px 80px -40px rgba(0,0,0,.8)}
+.recibo .rotulo{display:block}
+.recibo .valor{font-family:var(--f-titulo);font-weight:400;font-size:clamp(56px,7vw,86px);line-height:1;margin:14px 0 6px;background:var(--ouro-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.recibo .det{color:#E4CDBE;font-size:16px;line-height:1.55;min-height:3em}
+.recibo .sinal{margin:18px 0 22px;padding-top:16px;border-top:1px solid rgba(201,147,90,.25);font-size:15px;color:#E4CDBE}
+.recibo .sinal b{color:var(--ouro-claro);font-weight:400}
+.recibo .btn{width:100%;justify-content:center;font-size:16px;padding:18px}
+.tabela-bt{display:block;margin:22px auto 0;background:none;border:0;color:var(--ouro-claro);font-size:14px;letter-spacing:.08em;border-bottom:1px solid rgba(233,197,154,.4);padding-bottom:3px}
+.tabela{display:none;max-width:980px;margin:6vh auto 0;overflow-x:auto}
+.tabela.aberta{display:block}
+.tabela table{width:100%;border-collapse:collapse;font-size:14px;min-width:620px}
+.tabela th{font-family:var(--f-marca);font-weight:400;font-size:10.5px;letter-spacing:.2em;color:var(--ouro);text-align:right;padding:10px 8px;border-bottom:1px solid rgba(201,147,90,.35)}
+.tabela th:first-child,.tabela td:first-child{text-align:left}
+.tabela td{padding:12px 8px;text-align:right;border-bottom:1px solid rgba(201,147,90,.12);color:var(--texto)}
+.tabela td:first-child{font-family:var(--f-titulo);font-size:21px}
+.tabela td.d{color:var(--ouro-claro)}
+.tabela h4{font-family:var(--f-marca);font-weight:400;font-size:12px;letter-spacing:.3em;color:var(--ouro-claro);margin:26px 0 8px}
+.pop{animation:pop .5s var(--ease)}@keyframes pop{0%{transform:scale(.92);opacity:.4}100%{transform:none;opacity:1}}
+/* CENA 7 */
+.c7{background:var(--vinho-fundo);padding:12vh var(--margem) 0;position:relative;overflow:hidden;border-top:1px solid rgba(201,147,90,.15)}
+.c7 .topo7{text-align:center}
+.c7 h2{font-size:clamp(48px,7.4vw,120px);max-width:12ch;margin:22px auto 0}
+.passos{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,3vw,48px);max-width:1180px;margin:9vh auto 7vh}
+.passo{padding:30px 0 0;border-top:1px solid rgba(201,147,90,.3);position:relative}
+.passo::before{content:"";position:absolute;left:0;top:-1px;height:1px;width:100%;background:var(--ouro-claro);transform:scaleX(var(--p,0));transform-origin:left}
+.passo .n{font-family:var(--f-marca);font-style:normal;letter-spacing:.08em;font-weight:300;font-size:58px;line-height:1;background:var(--ouro-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.passo h3{font-family:var(--f-titulo);font-weight:400;font-size:30px;margin:14px 0 10px}
+.passo p{font-size:15px;line-height:1.65;color:var(--suave)}
+.cuidados{max-width:1180px;margin:0 auto 8vh;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.cuidados div{border:1px solid rgba(201,147,90,.22);border-radius:22px;padding:22px 24px;font-size:14.5px;line-height:1.6;color:var(--suave)}
+.cuidados b{display:block;font-family:var(--f-marca);font-weight:400;font-size:11px;letter-spacing:.3em;color:var(--ouro);margin-bottom:8px}
+.gigante{font-family:var(--f-marca);font-size:31vw;line-height:.78;padding-top:.22em;text-align:center;letter-spacing:.02em;margin-top:10vh;color:transparent;-webkit-text-stroke:1px rgba(233,197,154,.35);background:var(--ouro-grad);-webkit-background-clip:text;background-clip:text;user-select:none}
+footer{background:var(--vinho-fundo);border-top:1px solid rgba(201,147,90,.18);padding:26px var(--margem) 30px var(--margem);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:12px;letter-spacing:.06em;color:var(--suave)}
+.zap{position:fixed;right:14px;bottom:16px;z-index:72;display:none}
+@media (max-width:760px){
+  .topo .btn{display:none}
+  .zap{display:block}
+  .c1 .nome{transform:translateY(-70%)}
+  .c1 .base{flex-direction:column;align-items:flex-start}
+  .c1 .acao{align-items:flex-start}
+  .c1 .acao .btn{display:none}
+  .c4 .palco{width:74vw}
+  .c4 .frase{font-size:clamp(34px,10vw,60px)}
+  .c4 .f2{top:auto;bottom:24vh}
+  .cartao{width:72vw}.cartao:nth-child(even){margin-top:0}
+  .cartao .foto{aspect-ratio:4/3.6}
+  .c5 .contador{display:none}
+  .monte{grid-template-columns:1fr}
+  .recibo{position:static;padding:22px}
+  .passos,.cuidados{grid-template-columns:1fr;gap:22px}
+}
+@media (prefers-reduced-motion:reduce){
+  .grao{display:none}
+  .c2 .manifesto .p{opacity:1}
+  .c4 .frase{opacity:1;position:static}.c4 .zoom{display:none}
+}
+
+
+.gal{background:var(--vinho-fundo);padding:14vh var(--margem) 16vh var(--margem)}
+.gal-cab{margin-bottom:8vh}.gal-cab h2{font-size:clamp(44px,6.6vw,104px);margin-top:16px}
+.mosaico{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(12px,1.6vw,24px);max-width:1280px;margin:0 auto}
+.mosaico figure{position:relative;overflow:hidden;border-radius:26px;box-shadow:0 40px 70px -40px rgba(0,0,0,.9);margin:0}
+.mosaico img{width:100%;height:118%;object-fit:cover;will-change:transform}
+.mosaico figcaption{position:absolute;left:16px;bottom:14px;font-family:var(--f-marca);font-size:10px;letter-spacing:.3em;color:var(--ouro-claro);background:rgba(20,3,4,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:8px 14px;border-radius:999px;border:1px solid rgba(233,197,154,.25);text-transform:uppercase}
+.mosaico::after{content:"";grid-column:1/-1}
+.m1{grid-column:1/6;grid-row:span 2;aspect-ratio:.6}
+.m2{grid-column:6/10;aspect-ratio:.82;margin-top:10vh}
+.m3{grid-column:10/13;aspect-ratio:.75;margin-top:22vh}
+.m4{grid-column:6/9;aspect-ratio:.7}
+.m5{grid-column:9/13;aspect-ratio:.95}
+.m6{grid-column:1/5;aspect-ratio:.8}
+.m7{grid-column:5/13;aspect-ratio:1.75}
+.m8{grid-column:3/11;aspect-ratio:1.8}
+@media (max-width:760px){
+  .mosaico{grid-template-columns:1fr 1fr;gap:12px}
+  .mosaico figure{grid-column:auto!important;grid-row:auto!important;margin-top:0!important;aspect-ratio:.75!important}
+  .mosaico .m1,.mosaico .m7,.mosaico .m8{grid-column:1/3!important;aspect-ratio:1.3!important}
+  .mosaico .m1{aspect-ratio:.75!important}
+  .mosaico figcaption{font-size:8.5px;letter-spacing:.2em;padding:6px 10px;left:10px;bottom:10px}
+  .mosaico figure:nth-child(even){transform:translateY(5vh)}
+}
+
+.gal .gal-cab,.pres .gal-cab{margin-bottom:7vh}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(14px,2vw,28px);max-width:1200px;margin:0 auto;align-items:start}
+.trio figure,.pres-g figure{grid-column:auto;position:relative;overflow:hidden;border-radius:28px;margin:0;box-shadow:0 40px 70px -40px rgba(0,0,0,.9)}
+.trio figure{aspect-ratio:.72}.trio figure.meio{margin-top:8vh}
+.trio img,.pres-g img{width:100%;height:118%;object-fit:cover;will-change:transform}
+.trio figcaption{position:absolute;left:0;right:0;bottom:0;padding:60px 22px 20px;background:linear-gradient(transparent,rgba(20,3,4,.85))}
+.trio figcaption b{display:block;font-family:var(--f-titulo);font-weight:400;font-size:34px;color:var(--texto)}
+.trio figcaption span{font-size:13px;color:var(--ouro-claro);letter-spacing:.06em}
+.pres{background:var(--vinho-medio);padding:14vh var(--margem) 16vh var(--margem)}
+.pres-g{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(14px,2vw,26px);max-width:1200px;margin:0 auto}
+.pres-g figcaption{position:absolute;left:16px;bottom:14px;font-family:var(--f-marca);font-size:10px;letter-spacing:.3em;color:var(--ouro-claro);background:rgba(20,3,4,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:8px 14px;border-radius:999px;border:1px solid rgba(233,197,154,.25);text-transform:uppercase}
+.pres-g{grid-template-columns:1fr 1fr!important;max-width:1000px!important}
+.p1,.p2{aspect-ratio:.8}
+.c5{height:auto;overflow:visible;display:block;background:var(--creme);color:var(--tinta);padding:16vh var(--margem) 16vh var(--margem)}
+.c5 .cab{max-width:none;margin:0 0 7vh;display:block;padding:0}
+.c5 .cab .rotulo{color:#9a6a3f}.c5 h2{font-size:clamp(44px,6.6vw,104px);margin-top:16px}.c5 h2 em{color:#9a6a3f}
+.c5 .cab p{color:#6d4a3f;margin-top:14px;font-size:16px}
+.sabores{max-width:none;width:100%;margin:0;display:flex;flex-direction:column}
+.sbi{display:grid;grid-template-columns:56px 1fr auto 40px;align-items:center;gap:18px;text-align:left;background:none;border:0;border-top:1px solid rgba(74,10,18,.15);padding:26px 6px;color:var(--tinta);position:relative;transition:padding .5s var(--ease)}
+.sbi:last-child{border-bottom:1px solid rgba(74,10,18,.15)}
+.sbi::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(201,147,90,.14),transparent);transform:scaleX(0);transform-origin:left;transition:transform .6s var(--ease);z-index:0}
+.sbi:hover::before,.sbi:focus-visible::before{transform:scaleX(1)}
+.sbi>*{position:relative;z-index:1}
+.sn{font-family:var(--f-titulo);font-style:italic;font-size:26px;color:#9a6a3f}
+.st b{display:block;font-family:var(--f-titulo);font-weight:400;font-size:clamp(34px,4vw,52px);line-height:1}
+.gl{display:block;margin-top:12px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#9a6a3f}.sbi.sx .gl{color:var(--ouro)}
+.gr{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.gr i{font-style:normal;font-size:12.5px;letter-spacing:.04em;color:#6d4a3f;border:1px solid rgba(154,106,63,.4);border-radius:999px;padding:5px 12px}
+.sp{text-align:right;font-family:var(--f-titulo);font-size:26px;color:var(--vinho);white-space:nowrap}
+.sp small{display:block;font-family:var(--f-texto);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#9a6a3f}
+.sa{width:40px;height:40px;border-radius:50%;border:1px solid rgba(74,10,18,.25);display:grid;place-items:center;font-size:16px;color:var(--vinho);transition:background .4s,color .4s,transform .5s var(--ease)}
+.sbi:hover .sa{background:var(--vinho);color:var(--creme);transform:translateX(4px)}
+.sbi.sx{background:var(--vinho);color:var(--creme);border-radius:28px;border:0;margin-top:22px;padding:30px 26px}
+.sbi.sx .sn,.sbi.sx .sp small{color:var(--ouro)}.sbi.sx .sp{color:var(--ouro-claro)}
+.sbi.sx b{background:var(--ouro-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sbi.sx .gr i{color:var(--ouro-claro);border-color:rgba(233,197,154,.4)}
+.sbi.sx .sa{border-color:rgba(233,197,154,.4);color:var(--ouro-claro)}
+@media (max-width:760px){
+  .trio{grid-template-columns:1fr 1fr}.trio figure:first-child{grid-column:1/3;aspect-ratio:1}
+  .trio figure.meio{margin-top:0}
+  .trio figcaption b{font-size:24px}.trio figcaption{padding:40px 14px 14px}.trio figcaption span{font-size:11px;display:block;line-height:1.3}
+  .pres-g{grid-template-columns:1fr 1fr;gap:12px}
+  .pres-g{grid-template-columns:1fr 1fr!important}
+  .p1,.p2{aspect-ratio:.68}
+  .pres-g figcaption{font-size:8.5px;letter-spacing:.2em;padding:6px 10px}
+  .sbi{grid-template-columns:34px 1fr auto;gap:12px;padding:22px 2px}
+  .sa{display:none}.sn{font-size:20px}.sp{font-size:21px}
+  .sbi.sx{padding:24px 18px}
+}
+
+.monte>*{min-width:0}.recibo{min-width:0;max-width:100%}.dados input{width:100%;min-width:0;box-sizing:border-box}.dados .d2 label{min-width:0}
+.dados{display:flex;flex-direction:column;gap:12px;margin:4px 0 22px}
+.dados label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:#E4CDBE;letter-spacing:.02em}
+.dados input:not([type=checkbox]){font:inherit;font-size:16px;color:#FFF6EC;background:rgba(255,240,225,.08);border:1px solid rgba(233,197,154,.4);border-radius:16px;padding:13px 16px;outline:none;color-scheme:dark}
+.dados input:focus{border-color:var(--ouro-claro);box-shadow:0 0 0 3px rgba(233,197,154,.18)}
+.dados .d2{display:grid;grid-template-columns:1.3fr 1fr;gap:10px}
+.dados .ck{flex-direction:row;align-items:center;gap:10px;font-size:15px;color:#FFF6EC}
+.dados .ck input{width:20px;height:20px;accent-color:#C9935A}
+.dados small{font-size:12.5px;color:#C9AFA0}
+
+.mix{display:none;margin-top:16px;border:1px solid rgba(233,197,154,.35);border-radius:24px;padding:18px;background:rgba(255,240,225,.05)}
+.mix-cab{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;gap:10px}
+.mix-cab span{font-family:var(--f-titulo);font-size:22px;color:#FFF6EC}.mix-cab small{font-size:12.5px;color:var(--ouro-claro)}
+.gchips{display:flex;flex-wrap:wrap;gap:8px}
+.gchip{border:1px solid rgba(233,197,154,.4);background:transparent;color:#FFF6EC;border-radius:999px;padding:10px 16px;font-size:14.5px;transition:all .35s var(--ease)}
+.gchip.on{background:var(--ouro-grad);color:var(--vinho-fundo);border-color:transparent;transform:translateY(-1px)}
+.gchip.on::before{content:"✓ "}
+.mix-obs{font-size:12.5px;color:#C9AFA0;margin-top:12px;line-height:1.5}
+.op.monte-op{border-style:dashed;border-color:rgba(233,197,154,.6)}
+.sbi.monte-it{border-top:1px dashed rgba(154,106,63,.5)}
+.sbi.monte-it .sn{font-style:normal;color:var(--ouro)}
+
+/* ajustes 24/11: topo com fundo, sabores em cartões vinho, configurador alinhado */
+.topo{transition:background .5s var(--ease),padding .5s var(--ease),box-shadow .5s}
+.topo.solido{background:rgba(36,5,10,.86);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);padding-top:12px;padding-bottom:12px;box-shadow:0 10px 30px -20px rgba(0,0,0,.6)}
+.sbi,.sbi:last-child{background:var(--vinho);color:var(--creme);border:0;border-radius:28px;margin-top:14px;padding:28px 24px;overflow:hidden}
+.sbi .sn,.sbi .sp small,.sbi .gl{color:var(--ouro)}.sbi .sp{color:var(--ouro-claro)}
+.sbi b{background:var(--ouro-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sbi .gr i{color:var(--ouro-claro);border-color:rgba(233,197,154,.4)}
+.sbi .sa{border-color:rgba(233,197,154,.4);color:var(--ouro-claro)}
+.sbi::before{background:linear-gradient(90deg,rgba(233,197,154,.12),transparent)}
+.sbi:hover .sa{background:var(--ouro-claro);color:var(--vinho)}
+.sbi.monte-it{border:1px dashed rgba(233,197,154,.55)}
+.sbi.sx{box-shadow:0 0 0 1px rgba(233,197,154,.55),0 24px 50px -30px rgba(58,10,16,.7)}
+#g-s{display:grid;grid-template-columns:1fr;gap:10px}
+#g-s .op{width:100%;text-align:left;border-radius:22px;padding:14px 20px}
+.dados .d2{grid-template-columns:1fr 1fr}
+.dados input[type=date],.dados input[type=time]{-webkit-appearance:none;appearance:none;display:block;width:100%;min-height:52px;text-align:left}
+.dados input::-webkit-date-and-time-value{text-align:left}
+@media (max-width:620px){.sbi,.sbi:last-child,.sbi.sx{padding:22px 18px}}
+.fita{display:none}
+</style><script src="/config.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js" defer></script>
+</head>
+<body class="carregando">
+<div class="pre" id="pre"><div class="num" id="pre-num">000</div><div class="barra"><i id="pre-barra"></i></div><div class="rot">AURE · CHOCOLATIER</div></div>
+<div class="grao" aria-hidden="true"></div>
+<div class="cursor" id="cursor" aria-hidden="true"><span>PEDIR</span></div><div class="ponto" id="ponto" aria-hidden="true"></div>
+
+<header class="topo">
+  <a href="#topo" class="marca" aria-label="Aure Chocolatier"><b>AURE</b><small>CHOCOLATIER</small></a>
+  <a class="btn vidro magnetico" href="#monte" data-cursor="MONTAR">Montar minha caixa</a>
+</header>
+<main id="topo">
+<section class="c1" aria-label="Abertura">
+  <canvas id="choco" aria-hidden="true"></canvas>
+  <div class="veu"></div>
+  <div class="nome"><h1 aria-label="Aure"><span>A</span><span>U</span><span>R</span><span>E</span></h1><div class="sub">CHOCOLATIER</div></div>
+  <div class="base">
+    <p class="frase"><span class="rotulo">Cardápio · por encomenda</span>Chocolate nobre, castanhas e frutas, feito à mão.</p>
+    <div class="acao"><a class="btn magnetico" href="#monte" data-cursor="MONTAR">Montar minha caixa <span class="seta">→</span></a><div class="rolar"><i></i>ROLE PARA VER</div></div>
+  </div>
+</section>
+<section class="c2" aria-label="Sobre">
+  <span class="rotulo">Sobre a Aure</span>
+  <p class="manifesto" id="manifesto">Chocolate nobre, <em>meio amargo 40%</em>, <em>amargo 75%</em> ou <em>branco</em>, com castanhas, frutas secas e pequenos detalhes escolhidos à mão. Nada fica pronto na prateleira: <em>cada caixa começa no seu pedido.</em></p>
+</section>
+<div class="faixa" aria-hidden="true"><div class="trilho" id="faixa">
+  <span>CLÁSSICA</span><span class="cheio">✦</span><span>AVELÃ</span><span class="cheio">✦</span><span>TROPICAL</span><span class="cheio">✦</span><span>NOIR</span><span class="cheio">✦</span><span>BRASIL</span><span class="cheio">✦</span><span>PISTACHE</span><span class="cheio">✦</span><span>DOURADA</span><span class="cheio">✦</span><span>MEDITERRÂNEA</span><span class="cheio">✦</span><span>SORTIDA</span><span class="cheio">✦</span>
+  <span>CLÁSSICA</span><span class="cheio">✦</span><span>AVELÃ</span><span class="cheio">✦</span><span>TROPICAL</span><span class="cheio">✦</span><span>NOIR</span><span class="cheio">✦</span><span>BRASIL</span><span class="cheio">✦</span><span>PISTACHE</span><span class="cheio">✦</span><span>DOURADA</span><span class="cheio">✦</span><span>MEDITERRÂNEA</span><span class="cheio">✦</span><span>SORTIDA</span><span class="cheio">✦</span>
+</div></div>
+<section class="gal" aria-label="Do ateliê">
+  <div class="gal-cab"><span class="rotulo">Do ateliê</span><h2 class="serif">Cada peça,<br><em>uma pequena joia.</em></h2></div>
+  <div class="trio">
+    <figure><img src="q-diag.jpg" alt="Quadradinhos de chocolate com castanhas e frutas sobre mármore"><figcaption><b>Quadradinhos</b><span>≈ 19 g cada</span></figcaption></figure>
+    <figure class="meio"><img src="b-fila.jpg" alt="Barrinhas de chocolate lado a lado sobre mármore" style="object-position:50% 50%"><figcaption><b>Barrinhas</b><span>≈ 20 g, embaladas uma a uma</span></figcaption></figure>
+    <figure><img src="tab-marm.jpg" alt="Dois tabletes de chocolate com frutas sobre mármore"><figcaption><b>Barras</b><span>55 g · inteiras</span></figcaption></figure>
+  </div>
+</section>
+<section class="pres" aria-label="Caixas para presentear">
+  <div class="gal-cab"><span class="rotulo">Caixas para presentear</span><h2 class="serif">Pronto pra<br><em>emocionar.</em></h2></div>
+  <div class="pres-g">
+    <figure class="p1"><img src="aure-luz.jpg" alt="Caixa Aure com tabletes e barrinhas" style="object-position:50% 60%"><figcaption>Caixa Aure</figcaption></figure>
+    <figure class="p2"><img src="ref-caixa.jpg" alt="Caixa edição de Natal com barrinhas" style="object-position:55% 60%"><figcaption>Edição de Natal</figcaption></figure>
+  </div>
+</section>
+
+<section class="c4" aria-label="A caixa">
+  <div class="halo"></div>
+  <div class="topo-cena"><span class="rotulo">A caixa Aure</span></div>
+  <div class="palco"><div class="aberta"><img src="aure-caixa.jpg" alt="Caixa Aure com tabletes e barrinhas de chocolate"></div><div class="luz"></div></div>
+  <canvas id="faiscas" aria-hidden="true"></canvas>
+  <div class="frase f1 serif">Feita<br><em>à mão.</em></div>
+  <div class="frase f2 serif">Grão<br><em>por grão.</em></div>
+  <div class="frase f3 serif">Para quem<br><em>você ama.</em></div>
+  <div class="zoom"></div>
+</section>
+<section class="c5" aria-label="Sabores">
+  <div class="cab"><span class="rotulo">Sabores</span><h2 class="serif">Escolha o<br><em>seu sabor.</em></h2><p>Toque num sabor pra montar a sua caixa.</p></div>
+  <div class="sabores"><button class="sbi" data-sabor="Clássica"><span class="sn">01</span><span class="st"><b>Clássica</b><span class="gl">Ingredientes</span><span class="gr"><i>Castanha de caju</i><i>Amêndoa</i><i>Uva passa</i></span></span><span class="sp"><small>a partir de</small>R$ 13,90</span><span class="sa">→</span></button><button class="sbi" data-sabor="Avelã"><span class="sn">02</span><span class="st"><b>Avelã</b><span class="gl">Ingredientes</span><span class="gr"><i>Avelã</i><i>Nozes</i></span></span><span class="sp"><small>a partir de</small>R$ 14,90</span><span class="sa">→</span></button><button class="sbi" data-sabor="Tropical"><span class="sn">03</span><span class="st"><b>Tropical</b><span class="gl">Ingredientes</span><span class="gr"><i>Coco</i><i>Damasco</i><i>Castanha de caju</i></span></span><span class="sp"><small>a partir de</small>R$ 14,90</span><span class="sa">→</span></button><button class="sbi" data-sabor="Noir"><span class="sn">04</span><span class="st"><b>Noir</b><span class="gl">Ingredientes</span><span class="gr"><i>Amêndoa</i><i>Blueberry</i></span></span><span class="sp"><small>a partir de</small>R$ 14,90</span><span class="sa">→</span></button><button class="sbi" data-sabor="Brasil"><span class="sn">05</span><span class="st"><b>Brasil</b><span class="gl">Ingredientes</span><span class="gr"><i>Castanha-do-pará</i><i>Goji berry</i></span></span><span class="sp"><small>a partir de</small>R$ 13,90</span><span class="sa">→</span></button><button class="sbi" data-sabor="Pistache"><span class="sn">06</span><span class="st"><b>Pistache</b><span class="gl">Ingredientes</span><span class="gr"><i>Pistache</i><i>Castanha-do-pará</i><i>Blueberry</i></span></span><span class="sp"><small>a partir de</small>R$ 15,90</span><span class="sa">→</span></button><button class="sbi" data-sabor="Dourada"><span class="sn">07</span><span class="st"><b>Dourada</b><span class="gl">Ingredientes</span><span class="gr"><i>Damasco</i><i>Castanha de caju</i></span></span><span class="sp"><small>a partir de</small>R$ 14,90</span><span class="sa">→</span></button><button class="sbi" data-sabor="Mediterrânea"><span class="sn">08</span><span class="st"><b>Mediterrânea</b><span class="gl">Ingredientes</span><span class="gr"><i>Uva passa</i><i>Pistache</i><i>Nozes</i></span></span><span class="sp"><small>a partir de</small>R$ 14,90</span><span class="sa">→</span></button><button class="sbi monte-it" data-sabor="Monte o seu"><span class="sn">✦</span><span class="st"><b>Monte o seu</b><span class="gl">Você escolhe</span><span class="gr"><i>Até 4 grãos</i><i>Amendoim</i><i>Castanhas</i><i>Frutas secas</i><i>Pistache</i></span></span><span class="sp"><small>preço</small>na hora</span><span class="sa">→</span></button><button class="sbi sx" data-sabor="Sortida"><span class="sn">09</span><span class="st"><b>Sortida</b><span class="gl">Ingredientes</span><span class="gr"><i>Um de cada sabor da casa</i></span></span><span class="sp"><small>a partir de</small>R$ 25,90</span><span class="sa">→</span></button></div>
+</section>
+<section class="c6" id="monte" aria-label="Monte sua caixa">
+  <div class="cab"><span class="rotulo">Monte sua caixa</span><h2 class="serif">O preço aparece<br><em>na hora.</em></h2><p>Toque nas opções. O pedido vai pronto pro WhatsApp.</p></div>
+  <div class="monte">
+    <div>
+      <div class="grupo"><span class="rotulo">1 · Formato</span><div class="opcoes" id="g-fmt"><button class="op" data-f="q">Quadradinhos<small>≈ 19 g cada</small></button><button class="op" data-f="b">Barrinhas<small>≈ 20 g, embaladas uma a uma</small></button><button class="op" data-f="t">Barra 55 g<small>Tablete inteiro, com saquinho e etiqueta</small></button></div></div>
+      <div class="grupo"><span class="rotulo">2 · Quantidade</span><div class="opcoes" id="g-q"><button class="op num" data-q="4">4</button><button class="op num" data-q="6">6</button><button class="op num" data-q="10">10</button><button class="op num" data-q="+">+10</button></div>
+        <div class="qtd" id="qtd"><button data-d="-1" aria-label="Menos">−</button><b id="qn">12</b><button data-d="1" aria-label="Mais">+</button><span style="color:var(--suave);font-size:14px">chocolates · valor confirmado no WhatsApp</span></div></div>
+      <div class="grupo"><span class="rotulo">3 · Chocolate</span><div class="opcoes" id="g-c"><button class="op" data-c="40">Meio amargo 40%<small>Equilibrado e cremoso</small></button><button class="op" data-c="75">Amargo 75%<small>Intenso, muito cacau</small></button><button class="op" data-c="br">Branco<small>Doce, cremoso e suave</small></button></div></div>
+      <div class="grupo"><span class="rotulo">4 · Sabor</span><div class="opcoes" id="g-s"><button class="op sab" data-s="Clássica">Clássica<small>Castanha de caju, amêndoa e uva passa</small></button><button class="op sab" data-s="Avelã">Avelã<small>Avelã e nozes</small></button><button class="op sab" data-s="Tropical">Tropical<small>Coco, damasco e castanha de caju</small></button><button class="op sab" data-s="Noir">Noir<small>Amêndoa e blueberry</small></button><button class="op sab" data-s="Brasil">Brasil<small>Castanha-do-pará e goji berry</small></button><button class="op sab" data-s="Pistache">Pistache<small>Pistache, castanha-do-pará e blueberry</small></button><button class="op sab" data-s="Dourada">Dourada<small>Damasco e castanha de caju</small></button><button class="op sab" data-s="Mediterrânea">Mediterrânea<small>Uva passa, pistache e nozes</small></button><button class="op sab" data-s="Sortida">Sortida<small>Um chocolate de cada sabor da casa</small></button><button class="op sab monte-op" data-s="Monte o seu">✦ Monte o seu<small>Você escolhe os grãos</small></button></div>
+        <div id="mix" class="mix"><div class="mix-cab"><span>Escolha os grãos</span><small id="mix-n">Escolha até 4</small></div><div class="gchips"><button class="gchip" data-g="Amendoim">Amendoim</button><button class="gchip" data-g="Castanha de caju">Castanha de caju</button><button class="gchip" data-g="Amêndoa">Amêndoa</button><button class="gchip" data-g="Avelã">Avelã</button><button class="gchip" data-g="Castanha-do-pará">Castanha-do-pará</button><button class="gchip" data-g="Nozes">Nozes</button><button class="gchip" data-g="Pistache">Pistache</button><button class="gchip" data-g="Damasco">Damasco</button><button class="gchip" data-g="Blueberry">Blueberry</button><button class="gchip" data-g="Goji berry">Goji berry</button><button class="gchip" data-g="Uva passa">Uva passa</button><button class="gchip" data-g="Coco">Coco</button></div><p class="mix-obs">Os grãos escolhidos vão em todas as peças da caixa. Grãos mais nobres, como pistache e blueberry, deixam a caixa um pouco mais cara.</p></div></div>
+    </div>
+    <aside class="recibo" aria-live="polite">
+      <span class="rotulo">Sua caixa</span>
+      <div class="valor" id="valor">R$ 0</div>
+      <div class="det" id="det"></div>
+      <div class="sinal" id="sinal"></div>
+      <div class="dados">
+        <span class="rotulo">Seus dados</span>
+        <label>Nome<input id="f-nome" autocomplete="name" placeholder="Como podemos te chamar?"></label>
+        <label>WhatsApp <small style="opacity:.7">(opcional)</small><input id="f-tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="(27) 99999-9999"></label>
+        <div class="d2"><label>Data de retirada<input id="f-data" type="date"></label><label>Horário<input id="f-hora" type="time"></label></div>
+        <label class="ck"><input id="f-pres" type="checkbox"> É para presente</label>
+        <label id="l-cart" style="display:none">Mensagem do cartão<input id="f-cart" maxlength="140" placeholder="Ex.: Feliz aniversário, mãe!"></label>
+        <small>Pode deixar em branco e completar no WhatsApp.</small>
+      </div>
+      <a class="btn magnetico" id="pedir" data-cursor="PEDIR" href="#">Pedir pelo WhatsApp <span class="seta">→</span></a>
+    </aside>
+  </div>
+</section>
+<section class="c7" id="encomendar" aria-label="Como encomendar">
+  <div class="topo7"><span class="rotulo">Como encomendar</span><h2 class="serif">Três passos até a <em>sua caixa.</em></h2></div>
+  <div class="passos">
+    <div class="passo"><div class="n">I</div><h3>Monte e peça</h3><p>Escolha formato, quantidade, chocolate e sabor. O pedido vai pronto pro WhatsApp.</p></div>
+    <div class="passo"><div class="n">II</div><h3>Confirme com 50%</h3><p>A encomenda entra na produção com o sinal de 50% no Pix. O restante, na retirada.</p></div>
+    <div class="passo"><div class="n">III</div><h3>Retire</h3><p>Combinamos o dia e o horário. Não fazemos entrega. Peça com antecedência, principalmente em datas especiais.</p></div>
+  </div>
+  <div class="cuidados">
+    <div><b>COMO GUARDAR</b>Em lugar fresco e seco, longe do sol. Se for pra geladeira, em pote bem fechado, e espere uns 15 minutos antes de abrir.</div>
+    <div><b>ALERGÊNICOS</b>Contém castanhas e leite. Pode conter traços de amendoim e outras oleaginosas.</div>
+  </div>
+  <div class="gigante" id="gigante" aria-hidden="true">AURE</div>
+</section>
+</main>
+<footer><span>AURE CHOCOLATIER · Chocolates finos feitos à mão</span><span>Vila Velha–ES · sob encomenda</span></footer>
+<div class="zap"><a class="btn" href="#monte">Montar caixa <span class="seta">→</span></a></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script id="vs" type="x-shader/x-vertex">
+attribute vec2 p; void main(){ gl_Position = vec4(p,0.,1.); }
+</script>
+<script id="fs" type="x-shader/x-fragment">
+precision highp float;
+uniform vec2 r; uniform float t; uniform vec2 m; uniform float mf; uniform float s;
+float h21(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }
+float nz(vec2 p){ vec2 i=floor(p), f=fract(p); vec2 u=f*f*(3.-2.*f);
+  return mix(mix(h21(i),h21(i+vec2(1,0)),u.x),mix(h21(i+vec2(0,1)),h21(i+vec2(1,1)),u.x),u.y); }
+float fbm(vec2 p){ float v=0., a=.5; mat2 R=mat2(.8,.6,-.6,.8); for(int i=0;i<3;i++){ v+=a*nz(p); p=R*p*2.03; a*=.5; } return v; }
+float alt(vec2 p){
+  vec2 q=vec2(fbm(p+vec2(0.,t*.06)), fbm(p+vec2(5.2,1.3)-t*.05));
+  float h=fbm(p*1.15+3.4*q+vec2(1.7,9.2)+t*.03);
+  float d=length(p-m*vec2(r.x/r.y,1.)*1.6);
+  h+=mf*.06*sin(d*22.-t*5.)*exp(-d*3.2);
+  return h;
+}
+void main(){
+  vec2 uv=gl_FragCoord.xy/r; vec2 p=(uv-.5)*vec2(r.x/r.y,1.)*1.6;
+  p*=1.+s*.35; p.y+=s*.6+t*.012;
+  float e=.0045, h=alt(p);
+  vec3 n=normalize(vec3(h-alt(p+vec2(e,0.)), h-alt(p+vec2(0.,e)), e*1.15));
+  vec3 L=normalize(vec3(-.45,.6,.85)), V=vec3(0.,0.,1.), H=normalize(L+V);
+  float dif=clamp(dot(n,L),0.,1.);
+  float spe=pow(clamp(dot(n,H),0.,1.),70.);
+  float spe2=pow(clamp(dot(n,normalize(vec3(.5,-.3,.9)+V)),0.,1.),30.);
+  vec3 c0=vec3(.075,.022,.016), c1=vec3(.24,.085,.05), c2=vec3(.38,.16,.09);
+  vec3 col=mix(c0,c1,smoothstep(.25,.7,h)); col=mix(col,c2,smoothstep(.62,.9,h)*.6);
+  col*=.55+.75*dif;
+  col+=vec3(1.,.82,.58)*spe*.95+vec3(.85,.45,.35)*spe2*.12;
+  float fr=pow(1.-n.z,2.); col+=vec3(.55,.2,.18)*fr*.25;
+  col=mix(col,vec3(.16,.02,.04),smoothstep(.3,1.15,length(uv-.5)*1.3));
+  col*=1.-s*.55;
+  gl_FragColor=vec4(pow(col,vec3(.95)),1.);
+}
+</script>
+<script>
+(function(){
+  /* ================= configurador ================= */
+  var WHATS = '5527981462361';  // número com DDD, só dígitos. Ex.: 5527999999999
+  var D = {"p": {"Clássica|q4|40": 22.9, "Clássica|q4|75": 33.9, "Clássica|q4|br": 28.9, "Clássica|q6|40": 37.9, "Clássica|q6|75": 54.9, "Clássica|q6|br": 47.9, "Clássica|q10|40": 52.9, "Clássica|q10|75": 80.9, "Clássica|q10|br": 68.9, "Clássica|b4|40": 31.9, "Clássica|b4|75": 43.9, "Clássica|b4|br": 38.9, "Clássica|b6|40": 36.9, "Clássica|b6|75": 54.9, "Clássica|b6|br": 46.9, "Clássica|b10|40": 59.9, "Clássica|b10|75": 87.9, "Clássica|b10|br": 76.9, "Clássica|t1|40": 13.9, "Clássica|t1|75": 22.9, "Clássica|t1|br": 18.9, "Clássica|t2|40": 38.9, "Clássica|t2|75": 54.9, "Clássica|t2|br": 48.9, "Avelã|q4|40": 23.9, "Avelã|q4|75": 34.9, "Avelã|q4|br": 29.9, "Avelã|q6|40": 39.9, "Avelã|q6|75": 55.9, "Avelã|q6|br": 48.9, "Avelã|q10|40": 55.9, "Avelã|q10|75": 82.9, "Avelã|q10|br": 70.9, "Avelã|b4|40": 32.9, "Avelã|b4|75": 44.9, "Avelã|b4|br": 39.9, "Avelã|b6|40": 38.9, "Avelã|b6|75": 55.9, "Avelã|b6|br": 48.9, "Avelã|b10|40": 61.9, "Avelã|b10|75": 90.9, "Avelã|b10|br": 78.9, "Avelã|t1|40": 14.9, "Avelã|t1|75": 22.9, "Avelã|t1|br": 19.9, "Avelã|t2|40": 39.9, "Avelã|t2|75": 55.9, "Avelã|t2|br": 48.9, "Tropical|q4|40": 23.9, "Tropical|q4|75": 33.9, "Tropical|q4|br": 29.9, "Tropical|q6|40": 38.9, "Tropical|q6|75": 54.9, "Tropical|q6|br": 48.9, "Tropical|q10|40": 54.9, "Tropical|q10|75": 81.9, "Tropical|q10|br": 69.9, "Tropical|b4|40": 32.9, "Tropical|b4|75": 43.9, "Tropical|b4|br": 38.9, "Tropical|b6|40": 37.9, "Tropical|b6|75": 54.9, "Tropical|b6|br": 47.9, "Tropical|b10|40": 60.9, "Tropical|b10|75": 89.9, "Tropical|b10|br": 77.9, "Tropical|t1|40": 14.9, "Tropical|t1|75": 22.9, "Tropical|t1|br": 19.9, "Tropical|t2|40": 38.9, "Tropical|t2|75": 55.9, "Tropical|t2|br": 48.9, "Noir|q4|40": 24.9, "Noir|q4|75": 34.9, "Noir|q4|br": 30.9, "Noir|q6|40": 40.9, "Noir|q6|75": 56.9, "Noir|q6|br": 49.9, "Noir|q10|40": 56.9, "Noir|q10|75": 83.9, "Noir|q10|br": 72.9, "Noir|b4|40": 33.9, "Noir|b4|75": 44.9, "Noir|b4|br": 40.9, "Noir|b6|40": 39.9, "Noir|b6|75": 56.9, "Noir|b6|br": 49.9, "Noir|b10|40": 63.9, "Noir|b10|75": 92.9, "Noir|b10|br": 80.9, "Noir|t1|40": 14.9, "Noir|t1|75": 23.9, "Noir|t1|br": 19.9, "Noir|t2|40": 39.9, "Noir|t2|75": 56.9, "Noir|t2|br": 49.9, "Brasil|q4|40": 22.9, "Brasil|q4|75": 33.9, "Brasil|q4|br": 28.9, "Brasil|q6|40": 37.9, "Brasil|q6|75": 54.9, "Brasil|q6|br": 47.9, "Brasil|q10|40": 52.9, "Brasil|q10|75": 80.9, "Brasil|q10|br": 68.9, "Brasil|b4|40": 31.9, "Brasil|b4|75": 43.9, "Brasil|b4|br": 38.9, "Brasil|b6|40": 36.9, "Brasil|b6|75": 54.9, "Brasil|b6|br": 46.9, "Brasil|b10|40": 59.9, "Brasil|b10|75": 87.9, "Brasil|b10|br": 76.9, "Brasil|t1|40": 13.9, "Brasil|t1|75": 22.9, "Brasil|t1|br": 18.9, "Brasil|t2|40": 38.9, "Brasil|t2|75": 54.9, "Brasil|t2|br": 48.9, "Pistache|q4|40": 25.9, "Pistache|q4|75": 36.9, "Pistache|q4|br": 31.9, "Pistache|q6|40": 42.9, "Pistache|q6|75": 58.9, "Pistache|q6|br": 51.9, "Pistache|q10|40": 60.9, "Pistache|q10|75": 87.9, "Pistache|q10|br": 76.9, "Pistache|b4|40": 34.9, "Pistache|b4|75": 46.9, "Pistache|b4|br": 41.9, "Pistache|b6|40": 41.9, "Pistache|b6|75": 58.9, "Pistache|b6|br": 51.9, "Pistache|b10|40": 67.9, "Pistache|b10|75": 96.9, "Pistache|b10|br": 84.9, "Pistache|t1|40": 15.9, "Pistache|t1|75": 23.9, "Pistache|t1|br": 20.9, "Pistache|t2|40": 41.9, "Pistache|t2|75": 57.9, "Pistache|t2|br": 50.9, "Dourada|q4|40": 23.9, "Dourada|q4|75": 34.9, "Dourada|q4|br": 29.9, "Dourada|q6|40": 38.9, "Dourada|q6|75": 55.9, "Dourada|q6|br": 48.9, "Dourada|q10|40": 54.9, "Dourada|q10|75": 81.9, "Dourada|q10|br": 70.9, "Dourada|b4|40": 32.9, "Dourada|b4|75": 43.9, "Dourada|b4|br": 39.9, "Dourada|b6|40": 38.9, "Dourada|b6|75": 55.9, "Dourada|b6|br": 48.9, "Dourada|b10|40": 61.9, "Dourada|b10|75": 89.9, "Dourada|b10|br": 78.9, "Dourada|t1|40": 14.9, "Dourada|t1|75": 22.9, "Dourada|t1|br": 19.9, "Dourada|t2|40": 38.9, "Dourada|t2|75": 55.9, "Dourada|t2|br": 48.9, "Mediterrânea|q4|40": 24.9, "Mediterrânea|q4|75": 35.9, "Mediterrânea|q4|br": 30.9, "Mediterrânea|q6|40": 40.9, "Mediterrânea|q6|75": 56.9, "Mediterrânea|q6|br": 49.9, "Mediterrânea|q10|40": 56.9, "Mediterrânea|q10|75": 84.9, "Mediterrânea|q10|br": 72.9, "Mediterrânea|b4|40": 33.9, "Mediterrânea|b4|75": 44.9, "Mediterrânea|b4|br": 40.9, "Mediterrânea|b6|40": 39.9, "Mediterrânea|b6|75": 56.9, "Mediterrânea|b6|br": 49.9, "Mediterrânea|b10|40": 63.9, "Mediterrânea|b10|75": 92.9, "Mediterrânea|b10|br": 80.9, "Mediterrânea|t1|40": 14.9, "Mediterrânea|t1|75": 23.9, "Mediterrânea|t1|br": 19.9, "Mediterrânea|t2|40": 39.9, "Mediterrânea|t2|75": 56.9, "Mediterrânea|t2|br": 49.9, "Sortida|q4|40": 25.9, "Sortida|q4|75": 36.9, "Sortida|q4|br": 31.9, "Sortida|q6|40": 42.9, "Sortida|q6|75": 58.9, "Sortida|q6|br": 51.9, "Sortida|q10|40": 60.9, "Sortida|q10|75": 87.9, "Sortida|q10|br": 76.9, "Sortida|b4|40": 34.9, "Sortida|b4|75": 46.9, "Sortida|b4|br": 41.9, "Sortida|b6|40": 41.9, "Sortida|b6|75": 58.9, "Sortida|b6|br": 51.9, "Sortida|b10|40": 67.9, "Sortida|b10|75": 96.9, "Sortida|b10|br": 84.9, "Sortida|t1|40": 15.9, "Sortida|t1|75": 23.9, "Sortida|t1|br": 20.9, "Sortida|t2|40": 41.9, "Sortida|t2|75": 57.9, "Sortida|t2|br": 50.9}, "s": [["Clássica", "Castanha de caju, amêndoa e uva passa"], ["Avelã", "Avelã e nozes"], ["Tropical", "Coco, damasco e castanha de caju"], ["Noir", "Amêndoa e blueberry"], ["Brasil", "Castanha-do-pará e goji berry"], ["Pistache", "Pistache, castanha-do-pará e blueberry"], ["Dourada", "Damasco e castanha de caju"], ["Mediterrânea", "Uva passa, pistache e nozes"], ["Sortida", "Um chocolate de cada sabor da casa"]]};
+  var st = {f:'q', q:4, c:'40', s:'Sortida', n:12};
+  var brl = function(v){ return 'R$ ' + v.toFixed(2).replace('.',','); };
+  var $ = function(s){ return document.querySelector(s); };
+  function nome(f,q){ return f==='q' ? (q>1?'quadradinhos':'quadradinho') : f==='t' ? (q>1?'barras de 55 g':'barra de 55 g') : (q>1?'barrinhas':'barrinha'); }
+  var CHN = {'40':'meio amargo 40%','75':'amargo 75%','br':'branco'};
+  function botoesQ(){
+    var g = $('#g-q'), html = st.f==='t'
+      ? '<button class="op" data-q="1">1 barra<small>no saquinho</small></button><button class="op" data-q="2">Caixa com 2<small>pra presentear</small></button>'
+      : '<button class="op num" data-q="4">4</button><button class="op num" data-q="6">6</button><button class="op num" data-q="10">10</button><button class="op num" data-q="+">+10</button>';
+    if (g.dataset.f !== st.f){ g.innerHTML = html; g.dataset.f = st.f; }
+  }
+  var MIX = {graos:{'Amendoim':22.78,'Castanha de caju':102.8,'Amêndoa':108.63,'Avelã':156.3,'Castanha-do-pará':102.83,'Nozes':81.47,'Pistache':300.77,'Damasco':126.1,'Blueberry':172.66,'Goji berry':75.66,'Uva passa':56.16,'Coco':86.3},
+    choc:{'40':99,'75':185.93,'br':150}, mk:2, mo:{q:20/21,b:20/21,t:2.75},
+    q:{4:1.91,6:4.88,10:3.09}, b:{4:5.58,6:3.09,10:4.09}, t:{1:.17,2:5.58}, peB:.08};
+  st.mix = [];
+  function up90(v){ var f = Math.floor(v+1e-9); return (v <= f+0.9+1e-9) ? f+0.9 : f+1.9; }
+  function precoMix(){
+    if (st.q==='+' || !st.mix.length) return null;
+    var barra = st.f==='b', tab = st.f==='t', gc = tab?48:barra?16.5:15.6, gg = tab?7:barra?4:3.5;
+    if (MIX.fmt && MIX.fmt[st.f]){ gc = MIX.fmt[st.f].gc; gg = MIX.fmt[st.f].gg; }
+    var c = (gc*MIX.choc[st.c] + st.mix.reduce(function(s,g){ return s + gg/st.mix.length*MIX.graos[g]; },0))/1000;
+    var mat = st.q*(c + (barra?MIX.peB:0)) + MIX[st.f][st.q];
+    return Math.round(up90(mat*MIX.mk + st.q*MIX.mo[st.f])*100)/100;
+  }
+  function preco(){ if (st.s==='Monte o seu') return precoMix(); return st.q==='+' ? null : D.p[st.s+'|'+st.f+st.q+'|'+st.c]; }
+  function render(pulse){
+    if (st.f==='t'){ if (st.q!==1 && st.q!==2) st.q = 1; if (st.s==='Sortida') st.q = 2; }
+    else if (st.q===1 || st.q===2) st.q = 4;
+    botoesQ();
+    var q1 = document.querySelector('#g-q [data-q="1"]'); if (q1) q1.disabled = st.s==='Sortida';
+    document.querySelectorAll('#g-fmt .op').forEach(function(b){ b.classList.toggle('on', b.dataset.f===st.f); });
+    document.querySelectorAll('#g-q .op').forEach(function(b){ b.classList.toggle('on', String(st.q)===b.dataset.q); });
+    document.querySelectorAll('#g-c .op').forEach(function(b){ b.classList.toggle('on', b.dataset.c===st.c); });
+    document.querySelectorAll('#g-s .op').forEach(function(b){ b.classList.toggle('on', b.dataset.s===st.s); });
+    $('#qtd').style.display = st.q==='+' ? 'flex' : 'none'; $('#qn').textContent = st.n;
+    var p = preco(), ch = CHN[st.c];
+    var tam = st.q==='+' ? st.n+' '+nome(st.f,2) : (st.f==='t' && st.q===1) ? '1 barra de 55 g (no saquinho)' : st.q+' '+nome(st.f,st.q);
+    var mx = st.s==='Monte o seu';
+    $('#mix').style.display = mx ? 'block' : 'none';
+    document.querySelectorAll('#mix .gchip').forEach(function(b){ b.classList.toggle('on', st.mix.indexOf(b.dataset.g)>-1); });
+    $('#mix-n').textContent = st.mix.length ? st.mix.length+' de 4 escolhidos' : 'Escolha até 4';
+    var desc = mx ? (st.mix.length ? st.mix.join(', ') : 'escolha os grãos') : ((st.f==='t' && st.s==='Sortida') ? 'uma barra de cada sabor, você escolhe os dois' : (D.s.find(function(x){ return x[0]===st.s; })||[,''])[1]);
+    var v = $('#valor'); v.textContent = p ? brl(p) : ((st.s==='Monte o seu' && !st.mix.length) ? 'R$ —' : 'Sob consulta');
+    if (pulse){ v.classList.remove('pop'); void v.offsetWidth; v.classList.add('pop'); }
+    $('#det').innerHTML = (st.f==='t'&&st.q===1?'':'Caixa com ')+'<b style="color:var(--texto);font-weight:400">'+tam+'</b>, sabor <b style="color:var(--texto);font-weight:400">'+st.s+'</b> ('+desc.toLowerCase()+'), chocolate '+ch+'.';
+    $('#sinal').innerHTML = (mx && !st.mix.length) ? 'Escolha pelo menos 1 grão pra ver o preço' : p ? 'Sinal de 50% no Pix: <b>'+brl(p/2)+'</b> · o restante na retirada' : 'A gente confirma o valor pelo WhatsApp';
+    var nomeC = ($('#f-nome').value||'').trim(), dataC = ($('#f-data').value||'').trim(), horaC = ($('#f-hora').value||'').trim(), pres = $('#f-pres').checked, telC = ($('#f-tel').value||'').trim(), cartC = ($('#f-cart').value||'').trim();
+    $('#l-cart').style.display = pres ? '' : 'none';
+    var fmtData = dataC ? dataC.split('-').reverse().join('/') : '';
+    var msg = 'Olá, Aure! Quero fazer uma encomenda:\n\n'
+      + '• Caixa: '+tam+'\n'
+      + (mx ? '• Sabor: Monte o seu ('+(st.mix.length?st.mix.join(', '):'grãos a combinar')+')\n' : '• Sabor: '+st.s+'\n')
+      + '• Chocolate: '+ch+'\n'
+      + (p ? '• Valor: '+brl(p)+' (sinal de 50%: '+brl(p/2)+')\n' : '• Valor: a confirmar\n')
+      + '\nMeus dados:\n'
+      + 'Nome: '+(nomeC||'')+'\n'
+      + 'Data de retirada: '+(fmtData||'')+'\n'
+      + 'Horário: '+(horaC||'')+'\n'
+      + 'É para presente? '+(pres ? 'Sim. Mensagem do cartão: '+cartC : 'Não')+'\n';
+    $('#pedir').href = 'https://wa.me/'+WHATS+'?text='+encodeURIComponent(msg);
+    PEDIDO = {cliente:nomeC||'', tel:telC, cartao:pres?cartC:'', entrega:dataC||'', hora:horaC||'', presente:pres, f:st.f, q:st.q, n:st.q==='+'?st.n:null, s:st.s, c:st.c, mix:mx?st.mix.slice():[], preco:p||0};
+  }
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('button'); if(!b) return;
+    var d = b.dataset, mudou = false;
+    if (d.f){ st.f = d.f; mudou = true; }
+    if (d.q){ st.q = d.q==='+' ? '+' : +d.q; mudou = true; }
+    if (d.c){ st.c = d.c; mudou = true; }
+    if (d.s){ st.s = d.s; mudou = true; }
+    if (d.g){ var i = st.mix.indexOf(d.g); if (i>-1) st.mix.splice(i,1); else if (st.mix.length<4) st.mix.push(d.g); mudou = true; }
+    if (d.d){ st.n = Math.max(11, st.n + (+d.d)); mudou = true; }
+    if (d.sabor){ st.s = d.sabor; render(true); var alvo = $('#monte'); if (window.__lenis) window.__lenis.scrollTo(alvo,{duration:1.8}); else alvo.scrollIntoView({behavior:'smooth'}); return; }
+    if (b.id==='tabela-bt'){ var t=$('#tabela'); t.classList.toggle('aberta'); b.textContent = t.classList.contains('aberta') ? 'Fechar tabela' : 'Ver tabela completa de preços'; if (window.ScrollTrigger) ScrollTrigger.refresh(); return; }
+    if (mudou) render(true);
+  });
+  render(false);
+  ['f-nome','f-tel','f-data','f-hora','f-pres','f-cart'].forEach(function(id){ var el=document.getElementById(id); el.addEventListener('input',function(){render(false);}); el.addEventListener('change',function(){render(false);}); });
+
+  var reduz = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var celular = matchMedia('(max-width:760px)').matches;
+  var toqueApenas = matchMedia('(hover:none)').matches;
+  var estado = {scroll:0};
+
+  /* ================= chocolate em tempo real ================= */
+  var cv = document.getElementById('choco'), gl = cv.getContext('webgl', {antialias:false, alpha:false, powerPreference:'high-performance'});
+  if (gl){
+    function sh(tipo, id){ var x=gl.createShader(tipo); gl.shaderSource(x, document.getElementById(id).textContent); gl.compileShader(x); return x; }
+    var pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER,'vs')); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER,'fs')); gl.linkProgram(pr); gl.useProgram(pr);
+    var bf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,bf); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+    var lp = gl.getAttribLocation(pr,'p'); gl.enableVertexAttribArray(lp); gl.vertexAttribPointer(lp,2,gl.FLOAT,false,0,0);
+    var U = {r:gl.getUniformLocation(pr,'r'), t:gl.getUniformLocation(pr,'t'), m:gl.getUniformLocation(pr,'m'), mf:gl.getUniformLocation(pr,'mf'), s:gl.getUniformLocation(pr,'s')};
+    var escala = celular ? .7 : .6, mouse = {x:.2,y:.1,tx:.2,ty:.1,f:0};
+    function tam(){ var w=cv.clientWidth, h=cv.clientHeight, k=Math.min(escala, Math.sqrt(420000/(w*h))); cv.width=Math.round(w*k); cv.height=Math.round(h*k); gl.viewport(0,0,cv.width,cv.height); }
+    tam(); addEventListener('resize', tam);
+    cv.parentElement.addEventListener('pointermove', function(e){ var bb=cv.getBoundingClientRect(); mouse.tx=(e.clientX-bb.left)/bb.width-.5; mouse.ty=.5-(e.clientY-bb.top)/bb.height; mouse.f=1; });
+    var t0 = performance.now(), visivel = true, ultimo = 0, medidas = [], ajustado = false;
+    new IntersectionObserver(function(en){ visivel = en[0].isIntersecting; }).observe(cv);
+    var desenha = function(agora){
+      agora = agora || performance.now();
+      if (visivel && !document.hidden && agora - ultimo > 31){
+        if (ultimo && !ajustado){ medidas.push(agora - ultimo); if (medidas.length === 40){ var media = medidas.reduce(function(a,b){return a+b;})/40; if (media > 45 && escala > .3){ escala *= .7; tam(); medidas = []; } else ajustado = true; } }
+        ultimo = agora;
+        mouse.x += (mouse.tx-mouse.x)*.06; mouse.y += (mouse.ty-mouse.y)*.06; mouse.f *= .985;
+        gl.uniform2f(U.r, cv.width, cv.height); gl.uniform1f(U.t, reduz ? 8 : (performance.now()-t0)/1000);
+        gl.uniform2f(U.m, mouse.x, mouse.y); gl.uniform1f(U.mf, mouse.f); gl.uniform1f(U.s, estado.scroll);
+        gl.drawArrays(gl.TRIANGLES,0,3);
+      }
+      if (!reduz) requestAnimationFrame(desenha);
+    };
+    desenha();
+  } else { cv.style.background = 'radial-gradient(80% 70% at 35% 30%,#5a2214,#140304)'; }
+
+  /* manifesto palavra por palavra */
+  (function(){
+    var el = document.getElementById('manifesto'), out='';
+    el.childNodes.forEach(function(n){
+      var pal = function(t){ return t.split(/(\s+)/).map(function(w){ return /\S/.test(w) ? '<span class="p">'+w+'</span>' : w; }).join(''); };
+      out += n.nodeType===3 ? pal(n.textContent) : '<em>'+pal(n.textContent)+'</em>';
+    });
+    el.innerHTML = out;
+  })();
+  document.querySelectorAll('h2.serif').forEach(function(el){
+    el.innerHTML = el.innerHTML.split(/<br\s*\/?>/i).map(function(p){ return '<span class="mask"><span>'+p+'</span></span>'; }).join('');
+  });
+
+  var pre = document.getElementById('pre');
+  if (reduz || !window.gsap){ pre.remove(); document.body.classList.remove('carregando'); document.querySelectorAll('.c2 .manifesto .p').forEach(function(p){ p.style.opacity=1; }); return; }
+  gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.config({ignoreMobileResize:true});
+
+  var lenis = null;
+  if (window.Lenis){
+    lenis = new Lenis({duration:1.25, smoothWheel:true}); window.__lenis = lenis;
+    lenis.stop(); lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(function(t){ lenis.raf(t*1000); }); gsap.ticker.lagSmoothing(0);
+  }
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click', function(e){ var alvo=document.querySelector(a.getAttribute('href')); if(alvo && lenis){ e.preventDefault(); lenis.scrollTo(alvo,{duration:2}); } });
+  });
+
+  if (!toqueApenas){
+    var cur = document.getElementById('cursor'), pt = document.getElementById('ponto');
+    var cx = gsap.quickTo(cur,'x',{duration:.5,ease:'power3'}), cy = gsap.quickTo(cur,'y',{duration:.5,ease:'power3'});
+    var px = gsap.quickTo(pt,'x',{duration:.08}), py = gsap.quickTo(pt,'y',{duration:.08});
+    addEventListener('pointermove', function(e){ cx(e.clientX); cy(e.clientY); px(e.clientX); py(e.clientY); });
+    document.querySelectorAll('[data-cursor]').forEach(function(el){
+      el.addEventListener('mouseenter', function(){ cur.classList.add('ativo'); cur.querySelector('span').textContent = el.dataset.cursor; });
+      el.addEventListener('mouseleave', function(){ cur.classList.remove('ativo'); });
+    });
+    document.querySelectorAll('.magnetico').forEach(function(el){
+      el.addEventListener('mousemove', function(e){ var bb=el.getBoundingClientRect(); gsap.to(el,{x:(e.clientX-bb.left-bb.width/2)*.3, y:(e.clientY-bb.top-bb.height/2)*.4, duration:.6, ease:'power3'}); });
+      el.addEventListener('mouseleave', function(){ gsap.to(el,{x:0,y:0,duration:.9,ease:'elastic.out(1,.4)'}); });
+    });
+  }
+
+  var cont = {v:0}, num = document.getElementById('pre-num');
+  gsap.set('.c1 .nome h1 span', {yPercent:115});
+  gsap.set(['.c1 .nome .sub','.c1 .base > *','.topo'], {opacity:0});
+  gsap.timeline()
+    .to(cont, {v:100, duration:1.4, ease:'power2.inOut', onUpdate:function(){ num.textContent = String(Math.round(cont.v)).padStart(3,'0'); }})
+    .to('#pre-barra', {scaleX:1, duration:1.4, ease:'power2.inOut'}, 0)
+    .to('#pre', {yPercent:-100, duration:1.1, ease:'expo.inOut'}, '+=.15')
+    .add(function(){ document.body.classList.remove('carregando'); if(lenis) lenis.start(); })
+    .to('.c1 .nome h1 span', {yPercent:0, duration:1.6, ease:'expo.out', stagger:.09}, '-=.55')
+    .to('.c1 .nome .sub', {opacity:1, duration:1.4}, '-=1.1')
+    .fromTo('.c1 .base > *', {y:30}, {opacity:1, y:0, duration:1.3, ease:'expo.out', stagger:.12}, '-=1.2')
+    .to('.topo', {opacity:1, duration:1}, '-=1')
+    .add(function(){ pre.remove(); });
+
+  var sedoso = 'expo.out';
+
+  gsap.timeline({scrollTrigger:{trigger:'.c1', start:'top top', end:'+=100%', scrub:1, pin:true, onUpdate:function(s){ estado.scroll = s.progress; }}})
+    .to('.c1 .nome h1 span', {x:function(i){ return (i-1.5)*innerWidth*.12; }, opacity:0, ease:'power1.in'}, 0)
+    .to('.c1 .nome h1', {scale:1.1, ease:'none'}, 0)
+    .to('.c1 .nome .sub', {opacity:0, y:-20}, 0)
+    .to('.c1 .base', {opacity:0, y:-40}, 0);
+
+  gsap.to('#manifesto .p', {opacity:1, stagger:.05, ease:'none', scrollTrigger:{trigger:'#manifesto', start:'top 78%', end:'bottom 45%', scrub:true}});
+  var faixa = document.getElementById('faixa');
+  var loop = gsap.to(faixa, {xPercent:-50, duration:30, ease:'none', repeat:-1});
+  ScrollTrigger.create({trigger:'.faixa', start:'top bottom', end:'bottom top', onToggle:function(s){ s.isActive ? loop.play() : loop.pause(); }});
+
+  /* galeria do ateliê e presentes */
+  gsap.utils.toArray('.gal .mask>span, .pres .mask>span').forEach(function(s){ gsap.from(s, {yPercent:110, duration:1.3, ease:sedoso, scrollTrigger:{trigger:s.closest('section'), start:'top 70%'}}); });
+  gsap.utils.toArray('.trio figure, .pres-g figure').forEach(function(f){
+    gsap.from(f, {clipPath:'inset(100% 0 0 0 round 28px)', duration:1.6, ease:'expo.inOut', scrollTrigger:{trigger:f, start:'top 92%'}});
+    gsap.fromTo(f.querySelector('img'), {yPercent:-12, scale:1.15}, {yPercent:0, scale:1, ease:'none', scrollTrigger:{trigger:f, start:'top bottom', end:'bottom top', scrub:true}});
+  });
+
+  /* a caixa com faíscas douradas */
+  var fc = document.getElementById('faiscas'), fx = fc.getContext('2d'), fp = [], fW, fH, dpr = Math.min(devicePixelRatio||1,2);
+  function ftam(){ fW=fc.clientWidth; fH=fc.clientHeight; fc.width=fW*dpr; fc.height=fH*dpr; fx.setTransform(dpr,0,0,dpr,0,0); } ftam(); addEventListener('resize', ftam);
+  var rodando = false;
+  function explode(){ for (var i=0;i<(celular?70:140);i++){ var a=Math.random()*6.28, v=Math.random()*7+1.5; fp.push({x:fW/2+(Math.random()-.5)*fW*.25, y:fH*.5, vx:Math.cos(a)*v, vy:Math.sin(a)*v-3, r:Math.random()*1.8+.4, vida:1}); } if(!rodando){ rodando=true; requestAnimationFrame(anima); } }
+  function anima(){ fx.clearRect(0,0,fW,fH); for (var i=fp.length-1;i>=0;i--){ var q=fp[i]; q.x+=q.vx; q.y+=q.vy; q.vx*=.97; q.vy=q.vy*.97+.05; q.vida-=.009; if(q.vida<=0){ fp.splice(i,1); continue; } fx.beginPath(); fx.arc(q.x,q.y,q.r,0,6.28); fx.fillStyle='rgba(240,205,160,'+q.vida+')'; fx.fill(); } if (fp.length) requestAnimationFrame(anima); else rodando = false; }
+  var abriu = false;
+  gsap.timeline({scrollTrigger:{trigger:'.c4', start:'top top', end: celular ? '+=240%' : '+=300%', scrub:1.2, pin:true,
+      onUpdate:function(s){ if(s.progress>.35 && !abriu){ abriu=true; explode(); } if(s.progress<.25) abriu=false; }}})
+    .from('.c4 .palco', {scale:.7, opacity:0, y:80, duration:.7, ease:sedoso}, 0)
+    .fromTo('.c4 .aberta img', {scale:1.3}, {scale:1, duration:1.6, ease:'none'}, 0)
+    .to('.c4 .f1', {opacity:1, duration:.3}, .35)
+    .to('.c4 .luz', {xPercent:240, duration:.8, ease:'power2.inOut'}, .6)
+    .to('.c4 .halo', {opacity:1, scale:1.15, duration:.6}, .9)
+    .to('.c4 .f1', {opacity:0, y:-30, duration:.3}, 1.2)
+    .to('.c4 .f2', {opacity:1, duration:.3}, 1.4)
+    .to('.c4 .aberta img', {scale:1.12, duration:1.2, ease:'none'}, 1.6)
+    .to('.c4 .f2', {opacity:0, y:-30, duration:.3}, 2.1)
+    .to('.c4 .f3', {opacity:1, duration:.3}, 2.2)
+    .to('.c4 .palco', {scale:1.55, duration:1, ease:'power2.in'}, 2.7)
+    .to('.c4 .f3', {opacity:0, duration:.2}, 2.8)
+    .to('.c4 .zoom', {clipPath:'circle(150% at 50% 56%)', duration:.9, ease:'power2.in'}, 2.9);
+
+  /* sabores */
+  gsap.from('.c5 .mask>span', {yPercent:110, stagger:.1, duration:1.3, ease:sedoso, scrollTrigger:{trigger:'.c5', start:'top 70%'}});
+  gsap.utils.toArray('.sbi').forEach(function(s,i){ gsap.from(s, {opacity:0, y:40, duration:1.1, ease:sedoso, scrollTrigger:{trigger:s, start:'top 92%'}}); });
+
+  /* monte sua caixa */
+  gsap.from('.c6 .mask>span', {yPercent:110, stagger:.1, duration:1.3, ease:sedoso, scrollTrigger:{trigger:'.c6', start:'top 70%'}});
+  gsap.from('.c6 .grupo, .c6 .recibo', {opacity:0, y:50, stagger:.1, duration:1.2, ease:sedoso, scrollTrigger:{trigger:'.monte', start:'top 80%'}});
+
+  gsap.from('.c7 .mask>span', {yPercent:110, stagger:.1, duration:1.3, ease:sedoso, scrollTrigger:{trigger:'.c7', start:'top 70%'}});
+  gsap.utils.toArray('.passo').forEach(function(p,i){
+    gsap.from(p, {opacity:0, y:50, duration:1.3, ease:sedoso, delay:i*.12, scrollTrigger:{trigger:'.passos', start:'top 82%'}});
+    gsap.to(p, {'--p':1, duration:1.4, ease:'expo.inOut', delay:.3+i*.15, scrollTrigger:{trigger:'.passos', start:'top 82%'}});
+  });
+  gsap.from('#gigante', {yPercent:30, opacity:0, duration:1.6, ease:'expo.out', scrollTrigger:{trigger:'#gigante', start:'top 95%'}});
+  addEventListener('load', function(){ ScrollTrigger.refresh(); });
+  /* preços atualizados pelo app (config/cardapio, leitura pública) */
+  function carregarPrecos(){
+    try{
+      if (!window.firebase || !window.FIREBASE || /^COLE/.test(window.FIREBASE.apiKey)) return;
+      if (!firebase.apps.length) firebase.initializeApp(window.FIREBASE);
+      firebase.firestore().doc('config/cardapio').get().then(function(s){
+        if (!s.exists) return; var c = s.data(); if (!c || !c.p) return;
+        D.p = c.p;
+        if (c.mix){ var m = c.mix; MIX.graos = m.graos||MIX.graos; MIX.choc = m.choc||MIX.choc; MIX.mk = m.mk||MIX.mk; MIX.mo = m.mo||MIX.mo;
+          if (m.emb){ MIX.q = m.emb.q; MIX.b = m.emb.b; MIX.t = m.emb.t; } if (m.fmt){ MIX.fmt = m.fmt; MIX.peB = (m.fmt.b||{}).extra||MIX.peB; } }
+        document.querySelectorAll('.sbi[data-sabor]').forEach(function(el){
+          var n = el.getAttribute('data-sabor'), vs = Object.keys(D.p).filter(function(k){ return k.indexOf(n+'|')===0; }).map(function(k){ return D.p[k]; });
+          var sm = el.querySelector('.sp'); if (vs.length && sm){ var b = sm.querySelector('small'); sm.innerHTML = ''; if (b) sm.appendChild(b); sm.appendChild(document.createTextNode(brl(Math.min.apply(null,vs)))); }
+        });
+        try{ render(false); }catch(e){}
+      }, function(){});
+    }catch(e){}
+  }
+  window.addEventListener('load', function(){ setTimeout(carregarPrecos, 300); });
+})();
+
+window.addEventListener('scroll',function(){var t=document.querySelector('.topo'); if(t) t.classList.toggle('solido', window.scrollY>60);},{passive:true});
+
+  /* ===== envia o pedido direto para o app da Aure (Firebase) ===== */
+  var FIREBASE = self.AURE_FIREBASE || { apiKey: "COLE_AQUI" };
+  var PEDIDO = null;
+  function salvarNoApp(){
+    return new Promise(function(ok){
+      try{
+        if (!window.firebase || !PEDIDO || /^COLE/.test(FIREBASE.apiKey)) return ok(false);
+        if (!firebase.apps.length) firebase.initializeApp(FIREBASE);
+        var P = PEDIDO, CN = {'40':'40%','75':'75%','br':'branco'};
+        var n = P.q==='+' ? (P.n||12) : P.q;
+        var tam = P.f==='t' ? (n===1?'1 barra 55 g':'Caixa 2 barras 55 g') : 'Caixa '+n+' '+(P.f==='q'?'quadradinhos':'barrinhas');
+        var item = {tipo:'cx', nome: tam+' · '+(P.s==='Monte o seu' ? 'Monte o seu ('+(P.mix.join(', ')||'a combinar')+')' : P.s)+' · '+CN[P.c],
+          qtd:1, preco:P.preco||0, custo:0, f:P.f, q:P.q, n:P.n, s:P.s, c:P.c, mix:P.mix};
+        var doc = {cliente:(P.cliente||'Cliente do cardápio').slice(0,80), tel:String(P.tel||'').slice(0,20), presente:!!P.presente, cartao:String(P.cartao||'').slice(0,140), entrega:P.entrega||'', hora:P.hora||'',
+          itens:[item], total:P.preco||0, pag:'Pix', sinal:0, obs:'',
+          status:'aberta', origem:'cardapio', criado:new Date().toISOString()};
+        var t = setTimeout(function(){ ok(false); }, 3500);
+        firebase.firestore().collection('encomendas').add(doc).then(function(){ clearTimeout(t); ok(true); }, function(){ clearTimeout(t); ok(false); });
+      }catch(e){ ok(false); }
+    });
+  }
+  document.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('#pedir'); if (!a) return;
+    e.preventDefault(); if (a.dataset.enviando) return; a.dataset.enviando = '1';
+    var href = a.href, txt = a.innerHTML; a.innerHTML = 'Enviando pedido…';
+    salvarNoApp().then(function(){ a.innerHTML = txt; delete a.dataset.enviando; window.location.href = href; });
+  }, true);
+
+</script>
+</body></html>

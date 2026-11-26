@@ -1,0 +1,15 @@
+{
+  "name": "Aure Gestão",
+  "short_name": "Aure",
+  "description": "Painel da Aure Chocolatier: pedidos, produção, estoque e preços.",
+  "start_url": "/gestao",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F7F1EA",
+  "theme_color": "#5A0F1C",
+  "lang": "pt-BR",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}

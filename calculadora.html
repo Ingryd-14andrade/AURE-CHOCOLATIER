@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calculadora de preço Aure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Calculadora Aure: passos em cartões macios sobre creme, faixa vinho fixa com o preço embaixo */
+  --bg:#FAF4EE; --card:#FFFFFF; --ink:#2E1418; --soft:#7A6461; --line:#EEDFD5;
+  --wine:#5A0F1C; --wine-2:#7A1F2E; --rose:#F3E3DE; --gold:#B9824F; --gold-2:#DCB48A; --ok:#5E6B3C;
+  --serif:"Cormorant Garamond", Georgia, serif; --caps:"Cinzel", Georgia, serif; --sans:"Jost", system-ui, -apple-system, sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 var(--sans)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+header{background:var(--rose);border-radius:0 0 32px 32px;padding:calc(env(safe-area-inset-top) + 22px) 22px 30px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .logo{width:46px;height:46px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 4px 12px -6px rgba(90,15,28,.35)}
+.brand .logo svg{width:32px;height:20px}
+.brand b{font-family:var(--caps);font-size:15px;letter-spacing:.08em;color:var(--wine)}
+.brand span{font-size:13px;color:var(--wine-2);font-weight:500}
+h1{font-family:var(--serif);font-weight:600;font-size:40px;line-height:1.05;margin:18px 0 8px;text-wrap:balance}
+h1 em{color:var(--wine-2)}
+header p{margin:0;color:var(--soft);font-size:16px}
+
+main{max-width:560px;margin:0 auto;padding:22px 16px 230px;display:flex;flex-direction:column;gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:20px 18px;display:flex;flex-direction:column;gap:16px}
+.step{display:flex;gap:14px;align-items:center}
+.step i{flex:none;width:44px;height:44px;border-radius:50%;background:var(--wine);color:#fff;font-style:normal;font-weight:600;display:grid;place-items:center;font-size:18px}
+.step h2{margin:0;font-size:20px;font-weight:600}
+.step small{display:block;color:var(--soft);font-size:14px}
+label.l{font-weight:600;font-size:15px}
+.field{width:100%;border:1px solid var(--line);background:#FDF9F6;border-radius:18px;padding:13px 16px;font-size:17px}
+.field:focus{outline:0;border-color:var(--gold-2);box-shadow:0 0 0 3px #F3E3D3}
+
+.stepper{display:inline-flex;align-items:center;gap:6px;background:var(--rose);border-radius:20px;padding:6px}
+.stepper button{width:48px;height:44px;border:0;border-radius:15px;background:#fff;font-size:22px;font-weight:600;color:var(--wine)}
+.stepper button:active{transform:scale(.94)}
+.stepper input{width:64px;border:0;background:transparent;text-align:center;font-size:20px;font-weight:600}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px dashed #E2C9C3;background:#fff;border-radius:999px;padding:8px 14px;font-size:14.5px;color:var(--wine);transition:transform .15s}
+.chip:active{transform:scale(.95)}
+.chip.on{border-style:solid;border-color:var(--wine);background:var(--wine);color:#fff}
+.chip.solid{border-style:solid}
+.chips-label{font-size:13px;color:var(--soft);font-weight:500;margin-bottom:-6px}
+
+.items{display:flex;flex-direction:column;gap:10px}
+.item{border:1px solid var(--line);border-radius:20px;padding:12px 12px 12px 16px;display:grid;grid-template-columns:1fr auto;gap:8px 10px;align-items:center;background:#FFFDFB}
+.item .nm{font-weight:600;font-size:15.5px}
+.item .rm{border:0;background:var(--rose);color:var(--wine);width:34px;height:34px;border-radius:50%;font-size:18px;line-height:1}
+.item .row{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:14px;color:var(--soft)}
+.mini{width:84px;border:1px solid var(--line);border-radius:12px;padding:7px 8px;text-align:center;font-size:16px;background:#fff;color:var(--ink)}
+.item .cost{margin-left:auto;font-weight:600;color:var(--ink);font-size:16px}
+.empty{color:var(--soft);font-size:14px;text-align:center;padding:6px 0}
+
+.seg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;background:var(--rose);border-radius:20px;padding:6px}
+.seg button{border:0;border-radius:15px;background:transparent;padding:10px 0;font-weight:600;color:var(--wine)}
+.seg button.on{background:#fff;box-shadow:0 4px 10px -6px rgba(90,15,28,.4)}
+.hint{font-size:14px;color:var(--soft)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{background:#FDF9F6;border:1px solid var(--line);border-radius:18px;padding:12px 14px}
+.box small{display:block;color:var(--soft);font-size:13px}
+.box b{font-family:var(--serif);font-size:26px;font-weight:600}
+.row2{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+.bar{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 12px);max-width:560px;margin:0 auto;background:var(--wine);color:#fff;border-radius:30px;padding:16px 20px;display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:end;box-shadow:0 18px 40px -16px rgba(46,20,24,.7)}
+.bar small{display:block;color:#EBD6CC;font-size:14px}
+.bar .big{font-family:var(--serif);font-weight:600;font-size:46px;line-height:1;color:#FBE7E0}
+.bar .r{text-align:right;font-size:14px;color:#EBD6CC}
+.bar .r b{display:block;color:#fff;font-size:22px;font-weight:600}
+.bar .r strong{color:#fff}
+@media (max-width:370px){.bar .big{font-size:38px}h1{font-size:34px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.hbtns{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.hbtn{border:0;background:#fff;color:var(--wine);border-radius:999px;padding:10px 16px;font-weight:600;font-size:14.5px;box-shadow:0 6px 16px -10px rgba(90,15,28,.45)}
+.hbtn:active{transform:scale(.96)}
+.ov{position:fixed;inset:0;z-index:30;background:rgba(46,20,24,.4);display:flex;align-items:flex-end;justify-content:center}
+.sh{background:var(--bg);width:100%;max-width:560px;max-height:92%;overflow:auto;border-radius:30px 30px 0 0;padding:10px 16px calc(env(safe-area-inset-bottom) + 24px);display:flex;flex-direction:column;gap:14px;animation:up .35s cubic-bezier(.22,1,.36,1)}
+@keyframes up{from{transform:translateY(40px);opacity:.5}to{transform:none;opacity:1}}
+.sh::before{content:"";width:42px;height:5px;border-radius:9px;background:#E3CFC6;margin:0 auto}
+.sh-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sh-h h3{margin:0;font-family:var(--serif);font-size:28px;font-weight:600;color:var(--wine)}
+.x{border:0;background:var(--rose);color:var(--wine);width:38px;height:38px;border-radius:50%;font-size:20px}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:var(--rose);border-radius:20px;padding:6px}
+.tabs button{border:0;background:transparent;border-radius:15px;padding:10px 4px;font-weight:600;color:var(--wine);font-size:14px}
+.tabs button.on{background:#fff;box-shadow:0 4px 10px -6px rgba(90,15,28,.4)}
+.prow{display:grid;grid-template-columns:1fr 96px 34px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.prow:last-child{border-bottom:0}
+.prow input.n{border:0;background:transparent;font-weight:600;font-size:15px;min-width:0;padding:4px 0}
+.prow .unit{font-size:12px;color:var(--soft);display:block}
+.grp{font-size:12.5px;font-weight:600;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;margin-top:6px}
+.btn{border:0;border-radius:999px;padding:15px 18px;font-weight:600;font-size:16px;background:#fff;color:var(--wine);border:1px solid var(--line)}
+.btn.p{background:var(--wine);color:#fff;border:0;box-shadow:0 12px 24px -12px rgba(90,15,28,.65)}
+.btn.w{width:100%}
+.drop{display:flex;flex-direction:column;align-items:center;gap:6px;border:1.5px dashed var(--gold-2);border-radius:24px;padding:22px;background:#fff;color:var(--wine);text-align:center;cursor:pointer}
+.drop b{font-size:16px} .drop span{font-size:13.5px;color:var(--soft)}
+.note{background:#FBF2E6;border-radius:16px;padding:12px 14px;font-size:14px;color:#6B4A2E}
+.nrow{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.nrow small{color:var(--soft)} .nrow .up{color:#9E2F45;font-weight:600} .nrow .dn{color:var(--ok);font-weight:600}
+.spin{width:30px;height:30px;border:3px solid var(--line);border-top-color:var(--wine);border-radius:50%;animation:sp 1s linear infinite;margin:0 auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 150px);transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-size:14px;z-index:40;max-width:90%;text-align:center}
+.save-r{align-self:flex-start}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.kit-res{background:var(--wine);color:#fff;border-radius:24px;padding:16px 18px}
+.kit-res small{color:#EBD6CC;font-size:14px;display:block}
+.kit-res b{font-family:var(--serif);font-size:44px;font-weight:600;line-height:1.05;color:#FBE7E0}
+.kit-det{font-size:13.5px;color:#EBD6CC;margin-top:4px}
+.chip .pr{opacity:.75;font-size:12.5px;margin-left:4px}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--wine);font-weight:600;font-size:14px;text-decoration:none;background:#fff;border-radius:999px;padding:7px 14px;margin-bottom:14px;box-shadow:0 6px 16px -10px rgba(90,15,28,.45)}
+.modo{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#fff;border-radius:22px;padding:6px;margin-top:16px;box-shadow:0 6px 16px -10px rgba(90,15,28,.4)}
+.modo button{border:0;background:transparent;border-radius:17px;padding:12px 6px;font-weight:600;color:var(--wine);font-size:15px}
+.modo button.on{background:var(--wine);color:#fff}
+.mwrap{display:flex;flex-direction:column;gap:18px}
+.mwrap[hidden]{display:none}
+.chip.big{min-width:64px;padding:12px 18px;font-size:20px;font-weight:600;border-style:solid;text-align:center}
+.chip.big small{display:block;font-size:11.5px;font-weight:500;opacity:.75}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.trio .box{padding:10px 12px}.trio .box b{font-size:21px}.trio .box small{font-size:12px}
+.box.ok{background:#F1F3E8;border-color:#DDE3C8}
+.embed .back,.embed .brand{display:none}.embed header{padding-top:6px}
+</style>
+<script src="/config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<header>
+  <a class="back" href="/gestao">‹ Voltar pro app</a>
+  <div class="brand">
+    <div class="logo"><svg viewBox="0 0 64 38" aria-hidden="true"><path d="M31 17C23 6 9 6 2 12c8 6 20 8 29 5z" fill="#D6A679" stroke="#8A5530" stroke-width="1.2"/><path d="M33 17c8-11 22-11 29-5-8 6-20 8-29 5z" fill="#D6A679" stroke="#8A5530" stroke-width="1.2"/><ellipse cx="32" cy="24" rx="6.5" ry="12.5" fill="#C38C58" stroke="#8A5530" stroke-width="1.2"/><path d="M32 12v24" stroke="#8A5530" stroke-width="1"/></svg></div>
+    <div><b>AURE</b> <span>· Chocolatier</span></div>
+  </div>
+  <h1 id="h-tit">Quanto cobrar <em>pela caixa?</em></h1>
+  <p id="h-sub">Escolha o tamanho e o sabor. O preço aparece na hora.</p>
+  <div class="modo" role="group" aria-label="Modo"><button data-act="modo" data-m="caixa">Montar caixa</button><button data-act="modo" data-m="receita">Calcular receita</button></div>
+  <div class="hbtns" id="hbtns"><button class="hbtn" data-act="cfg" data-t="ing">Meus preços</button><button class="hbtn" data-act="cfg" data-t="nota">Ler nota</button><button class="hbtn" data-act="cfg" data-t="rec">Receitas</button></div>
+</header>
+
+<main>
+<div id="m-caixa" class="mwrap">
+  <section class="card" aria-labelledby="c1">
+    <div class="step"><i>1</i><div><h2 id="c1">Quantos chocolates?</h2><small>Toque no tamanho da caixa</small></div></div>
+    <div class="chips-label">Quadradinhos</div><div class="chips" id="t-q"></div>
+    <div class="chips-label">Barrinhas</div><div class="chips" id="t-b"></div>
+    <div class="chips-label">Barra 55 g</div><div class="chips" id="t-t"></div>
+    <div id="t-livre" hidden><label class="l" for="k-q">Quantos chocolates?</label><div class="stepper"><button data-act="kq" data-d="-1" aria-label="Menos">−</button><input id="k-q" inputmode="numeric" value="12" aria-label="Quantidade"><button data-act="kq" data-d="1" aria-label="Mais">+</button></div><div class="hint">A caixa grande ainda é estimada (R$ 4 a R$ 4,50).</div></div>
+  </section>
+  <section class="card" aria-labelledby="c2">
+    <div class="step"><i>2</i><div><h2 id="c2">Qual sabor?</h2><small id="k-desc">Escolha um sabor da casa</small></div></div>
+    <div class="chips-label">Chocolate</div><div class="chips" id="k-base"></div>
+    <div class="chips-label" style="margin-top:12px">Sabor</div><div class="chips" id="k-presets"></div>
+    <div id="monte" hidden>
+      <div class="note" style="margin-bottom:12px">Escolha quantos grãos quiser. Cada grão vai em todas as peças.</div>
+      <div class="chips-label">Grãos</div><div class="chips" id="k-graos"></div>
+    </div>
+  </section>
+  <section class="card" aria-labelledby="c3">
+    <div class="step"><i>3</i><div><h2 id="c3">Pronto, é só cobrar</h2><small id="k-det"></small></div></div>
+    <div class="kit-res"><small>O cliente paga</small><b class="num" id="k-preco">R$ 0</b></div>
+    <div class="trio">
+      <div class="box"><small>Gasto com material</small><b class="num" id="k-custo">R$ 0</b></div>
+      <div class="box"><small>Seu trabalho</small><b class="num" id="k-mov">R$ 0</b></div>
+      <div class="box ok"><small>Sobra pra marca</small><b class="num" id="k-lucro">R$ 0</b></div>
+    </div>
+    <div class="note" id="k-alerta" hidden></div>
+    <button class="btn p w" data-act="k-msg">Copiar mensagem pro cliente</button>
+    <div class="row2"><button class="chip solid" data-act="k-copiar">Copiar tabela completa</button><button class="chip solid" data-act="cfg" data-t="kit">Ajustar preços</button></div>
+  </section>
+</div>
+<div id="m-receita" class="mwrap">
+  <section class="card" aria-labelledby="s1">
+    <div class="step"><i>1</i><div><h2 id="s1">Qual chocolate você fez?</h2><small>Nome e quantas peças rendeu</small></div></div>
+    <div class="chips" id="presets"></div>
+    <label class="l" for="nome">Nome do chocolate</label>
+    <input class="field" id="nome" placeholder="Barrinha, rodinha…">
+    <label class="l" for="rend">Quantas peças rendeu?</label>
+    <div class="stepper"><button data-act="rend" data-d="-1" aria-label="Menos">−</button><input id="rend" inputmode="numeric" value="10" aria-label="Peças"><button data-act="rend" data-d="1" aria-label="Mais">+</button></div>
+  </section>
+
+  <section class="card" aria-labelledby="s2">
+    <div class="step"><i>2</i><div><h2 id="s2">O que você usou?</h2><small>Toque num item pra adicionar rápido</small></div></div>
+    <div class="chips-label">Chocolates</div><div class="chips" id="ch-chocolate"></div>
+    <div class="chips-label">Castanhas</div><div class="chips" id="ch-castanha"></div>
+    <div class="chips-label">Frutas e coberturas</div><div class="chips" id="ch-fruta"></div>
+    <div class="chips"><button class="chip solid" data-act="novo">+ Outro ingrediente</button></div>
+    <div class="items" id="ings"></div>
+    <button class="chip solid save-r" data-act="salvar-rec">Salvar como receita</button>
+  </section>
+
+  <section class="card" aria-labelledby="s3">
+    <div class="step"><i>3</i><div><h2 id="s3">Embalagem e gastos</h2><small>Por peça vendida sozinha</small></div></div>
+    <div class="chips" id="ch-emb-peca"></div>
+    <div class="items" id="embp"></div>
+    <div class="row2"><label class="l" for="fixo">Gastos fixos por peça (gás, energia)</label><input class="mini" id="fixo" inputmode="decimal" placeholder="0,00" aria-label="Gastos fixos por peça"></div>
+    <div class="hint">Divida os gastos do mês pelas peças que vocês fazem. Ex.: R$ 100 ÷ 200 peças = R$ 0,50.</div>
+  </section>
+
+  <section class="card" aria-labelledby="s4">
+    <div class="step"><i>4</i><div><h2 id="s4">Quanto quer lucrar?</h2><small>Escolha quantas vezes o custo</small></div></div>
+    <div class="seg" role="group" aria-label="Multiplicador" id="mk"></div>
+    <div class="hint" id="mk-hint"></div>
+    <div class="split">
+      <div class="box"><small>Custo por peça</small><b class="num" id="o-custo">R$ 0</b></div>
+      <div class="box"><small>Lucro por peça</small><b class="num" id="o-lucro">R$ 0</b></div>
+    </div>
+    <div class="row2"><span class="l">Taxas: cartão <input class="mini" id="tx-c" inputmode="decimal" value="3" aria-label="Taxa do cartão em %">% · iFood <input class="mini" id="tx-i" inputmode="decimal" value="15" aria-label="Taxa do iFood em %">%</span></div>
+    <div class="split">
+      <div class="box"><small>No cartão</small><b class="num" id="o-cartao">R$ 0</b></div>
+      <div class="box"><small>No iFood</small><b class="num" id="o-ifood">R$ 0</b></div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="s5">
+    <div class="step"><i>5</i><div><h2 id="s5">Monte a caixa</h2><small>Opcional: preço da caixa com essas peças</small></div></div>
+    <div class="chips" id="caixas"></div>
+    <label class="l" for="pcx">Quantas peças vão na caixa?</label>
+    <div class="stepper"><button data-act="pcx" data-d="-1" aria-label="Menos">−</button><input id="pcx" inputmode="numeric" value="0" aria-label="Peças na caixa"><button data-act="pcx" data-d="1" aria-label="Mais">+</button></div>
+    <div class="chips" id="ch-emb-cx"></div>
+    <div class="items" id="embc"></div>
+    <div class="split">
+      <div class="box"><small>Custo da caixa</small><b class="num" id="o-cxcusto">R$ 0</b></div>
+      <div class="box"><small>Preço da caixa</small><b class="num" id="o-cxpreco">R$ 0</b></div>
+    </div>
+  </section>
+</div>
+</main>
+
+<div class="bar" role="status" aria-live="polite">
+  <div><small id="b-lab">Cobre por peça</small><div class="big num" id="b-preco">R$ 0</div></div>
+  <div class="r" id="b-dir"></div>
+</div>
+
+<script>
+if(window.parent!==window) document.documentElement.classList.add("embed");
+/* mesma configuração do app (index.html) */
+const FIREBASE = self.AURE_FIREBASE;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const brl = v => (Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const num = s => { s = String(s??'').trim().replace(/\s|R\$/g,''); if(s.includes(',')) s = s.replace(/\./g,'').replace(',','.'); const n = parseFloat(s); return isNaN(n)?0:n; };
+const fmt = (v,d=2) => (Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const up = v => Math.ceil(v*2)/2;
+const norm = s => String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const clone = o => JSON.parse(JSON.stringify(o));
+let tt = 0; function toast(m){ let t = $('.toast'); if(!t){ t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role','status'); document.body.appendChild(t); } t.textContent = m; clearTimeout(tt); tt = setTimeout(()=>t.remove(),2600); }
+
+/* ===== configuração (preços, embalagens, receitas, caixas) ===== */
+const CATN = {chocolate:'Chocolates',castanha:'Castanhas',fruta:'Frutas e coberturas',outro:'Outros'};
+const CFG_PAD = {
+  ings:[
+    {cat:'chocolate',n:'Chocolate meio amargo',p:99},{cat:'chocolate',n:'Chocolate amargo 75%',p:185.93},{cat:'chocolate',n:'Chocolate branco',p:150},
+    {cat:'castanha',n:'Castanha de caju',p:102.80},{cat:'castanha',n:'Amêndoa',p:108.63},{cat:'castanha',n:'Avelã',p:156.30},{cat:'castanha',n:'Castanha-do-pará',p:102.83},{cat:'castanha',n:'Nozes',p:81.47},{cat:'castanha',n:'Pistache',p:300.77},{cat:'castanha',n:'Amendoim',p:22.78},
+    {cat:'fruta',n:'Damasco',p:126.10},{cat:'fruta',n:'Blueberry',p:172.66},{cat:'fruta',n:'Goji berry',p:75.66},{cat:'fruta',n:'Uva passa',p:56.16},{cat:'fruta',n:'Coco em chips',p:86.30},{cat:'fruta',n:'Framboesa liofilizada',p:0},
+    {cat:'outro',n:'Leite condensado',p:15.16},{cat:'outro',n:'Creme de leite',p:15.95},{cat:'outro',n:'Leite em pó Ninho',p:55.24}
+  ],
+  embs:[{n:'Saquinho',p:0.08,t:'peca'},{n:'Adesivo',p:0.09,t:'peca'},{n:'Forminha 4 pétalas',p:0.06,t:'peca'},{n:'Pote 170 ml',p:0.4,t:'peca'},{n:'Caixa 4 doces (Papieri)',p:1.32,t:'cx'},{n:'Caixa 8 (estimada)',p:2.2,t:'cx'},{n:'Caixa 10 (estimada)',p:2.5,t:'cx'},{n:'Caixa 6 barras (estimada)',p:2.5,t:'cx'},{n:'Caixa 10 barras (estimada)',p:3.5,t:'cx'},{n:'Caixa S12 (Rizzo)',p:1.89,t:'cx'},{n:'Caixa grande (estimada)',p:4,t:'cx'},{n:'Caixa grande barras (estimada)',p:4.5,t:'cx'},{n:'Caixa S4 (Rizzo)',p:2.89,t:'cx'},{n:'Caixa Cromus tablete',p:4.99,t:'cx'},{n:'Caixa Cromus P6',p:4.29,t:'cx'},{n:'Sacola de papel',p:2.79,t:'cx'},{n:'Fita (metro)',p:0,t:'cx'},{n:'Adesivo com logo',p:0.09,t:'cx'},{n:'Papel de seda',p:0.5,t:'cx'},{n:'Cartão',p:0,t:'cx'},{n:'Medalhão Aure',p:0.46,t:'cx'}],
+  receitas:{
+    'Barrinha':{rend:10,ings:[['Chocolate meio amargo',160],['Castanha de caju',30],['Damasco',30]]},
+    'Rodinha':{rend:8,ings:[['Chocolate meio amargo',224],['Amêndoa',32],['Blueberry',32],['Damasco',32]]},
+    'Medalhão':{rend:10,ings:[['Chocolate meio amargo',100]]}
+  },
+  caixas:{
+    'Petit':{p:4,e:[['Caixa S12 (Rizzo)',1],['Fita (metro)',0.6],['Adesivo com logo',1],['Papel de seda',1],['Cartão',1]]},
+    'Classique':{p:8,e:[['Caixa S4 (Rizzo)',1],['Medalhão Aure',1],['Fita (metro)',0.8],['Adesivo com logo',1],['Papel de seda',1],['Cartão',1]]},
+    'Grand Aure':{p:12,e:[['Caixa S4 (Rizzo)',1],['Medalhão Aure',1],['Fita (metro)',0.8],['Adesivo com logo',1],['Papel de seda',1],['Cartão',1]]}
+  },
+  txc:3, txi:15, fixo:0, atualizado:'',
+  kit:{mk:2, gChocB:16.5, gGraoB:4, pecas:5, gChoc:15.6, gGrao:3.5, base:{'Chocolate meio amargo':11.5,'Chocolate amargo 75%':11.5,'Chocolate branco':11.5}, add:{simples:2,nobre:4.5,pistache:8}, caixa:15, cxEmb:'Caixa Cromus tablete', tier:{}, tam:[{n:'4 quadradinhos',q:4,emb:['Caixa 4 doces (Papieri)','Adesivo','Papel de seda'],taxa:4.5},{n:'6 quadradinhos',q:6,emb:['Caixa Cromus P6','Adesivo','Papel de seda'],taxa:13.5},{n:'10 quadradinhos',q:10,emb:['Caixa 10 (estimada)','Adesivo','Papel de seda'],taxa:8},{n:'quadradinhos (mais de 10)',q:12,livre:true,emb:['Caixa grande (estimada)','Adesivo','Papel de seda'],taxa:12.5},{n:'4 barrinhas',q:4,emb:['Caixa Cromus tablete','Adesivo','Papel de seda'],taxa:15.5,extra:0.08,peca:['Saquinho']},{n:'6 barrinhas',q:6,emb:['Caixa 6 barras (estimada)','Adesivo','Papel de seda'],taxa:8,extra:0.08,peca:['Saquinho']},{n:'10 barrinhas',q:10,emb:['Caixa 10 barras (estimada)','Adesivo','Papel de seda'],taxa:11,extra:0.08,peca:['Saquinho']},{n:'barrinhas (mais de 10)',q:12,livre:true,emb:['Caixa grande barras (estimada)','Adesivo','Papel de seda'],taxa:14,extra:0.08,peca:['Saquinho']},{n:'1 barra 55 g',lab:'1 barra',q:1,emb:[],peca:['Saquinho','Adesivo'],gc:48,gg:7,mo:2.75},{n:'2 barras 55 g',lab:'Caixa com 2',q:2,emb:['Caixa Cromus tablete','Adesivo','Papel de seda'],gc:48,gg:7,mo:2.75}], mo:{hora:20,min:60,pecas:21}}
+};
+const NOBRES = ['castanha de caju','castanha-do-para','amendoa','avela','damasco','blueberry','framboesa liofilizada'];
+const KITS = {'Clássica':{b:'Chocolate meio amargo',g:['Castanha de caju','Amêndoa','Uva passa']},'Avelã':{b:'Chocolate meio amargo',g:['Avelã','Nozes']},'Tropical':{b:'Chocolate meio amargo',g:['Coco em chips','Damasco','Castanha de caju']},'Noir':{b:'Chocolate meio amargo',g:['Amêndoa','Blueberry']},'Brasil':{b:'Chocolate meio amargo',g:['Castanha-do-pará','Goji berry']},'Pistache':{b:'Chocolate meio amargo',g:['Pistache','Castanha-do-pará','Blueberry']},'Dourada':{b:'Chocolate meio amargo',g:['Damasco','Castanha de caju']},'Mediterrânea':{b:'Chocolate meio amargo',g:['Uva passa','Pistache','Nozes']}};
+const KN = () => Object.assign(clone(CFG_PAD.kit), CFG.kit||{});
+const tierOf = n => { const k = KN(); if(k.tier && k.tier[n]) return k.tier[n]; const m = norm(n); return m.includes('pistache') ? 'pistache' : NOBRES.includes(m) ? 'nobre' : 'simples'; };
+let CFG = clone(CFG_PAD);
+let db = null, cfgRef = null;
+try{ const c = JSON.parse(localStorage.getItem('aure-calc-cfg')||'null'); if(c) CFG = Object.assign(clone(CFG_PAD),c); }catch(e){}
+
+async function salvarCfg(){
+  try{ localStorage.setItem('aure-calc-cfg',JSON.stringify(CFG)); }catch(e){}
+  try{ if(window.parent!==window) window.parent.postMessage({calcCfg:clone(CFG)},'*'); }catch(e){}
+  if(cfgRef){ try{ await cfgRef.set(clone(CFG)); }catch(e){ toast('Salvo só neste aparelho'); } }
+}
+async function conectar(){
+  let d = null;
+  try{ const F = FIREBASE; if(window.firebase && F.apiKey && !/^COLE/.test(F.apiKey)){ if(!firebase.apps.length) firebase.initializeApp(F); const u = await new Promise(r=>{ const off = firebase.auth().onAuthStateChanged(x=>{ off(); r(x); }); }); if(u) d = firebase.firestore(); } }catch(e){}
+  if(!d){ try{ if(window.parent!==window && window.parent.db) d = window.parent.db; }catch(e){} }
+  if(!d) return; db = d; cfgRef = db.doc('config/precos');
+  cfgRef.onSnapshot(s=>{ if(s.exists){ CFG = Object.assign(clone(CFG_PAD), s.data()); try{ localStorage.setItem('aure-calc-cfg',JSON.stringify(CFG)); }catch(e){} syncPrecos(); all(); if(ov) redrawSheet(); } }, ()=>{});
+}
+
+const priceOf = n => { const i = CFG.ings.find(x=>x.n===n); return i ? i.p : 0; };
+const embPrice = n => { const e = CFG.embs.find(x=>x.n===n); return e ? e.p : 0; };
+
+/* ===== cálculo atual ===== */
+let S = {nome:'Barrinha',rend:10,ings:[],embp:[],embc:[],mk:3,pcx:0,cx:''};
+try{ const s = JSON.parse(localStorage.getItem('aure-calc')||'null'); if(s) S = Object.assign(S,s); }catch(e){}
+if(!S.ings.length){ CFG.receitas.Barrinha.ings.forEach(([n,g])=>S.ings.push({n,q:g,p:priceOf(n),u:'g'})); }
+function syncPrecos(){
+  S.ings.forEach(x=>{ if(!x.custom && CFG.ings.some(i=>i.n===x.n)) x.p = priceOf(x.n); });
+  S.embp.forEach(x=>{ if(CFG.embs.some(e=>e.n===x.n)) x.p = embPrice(x.n); });
+  S.embc.forEach(x=>{ if(CFG.embs.some(e=>e.n===x.n)) x.p = embPrice(x.n); });
+}
+syncPrecos();
+
+function chips(){
+  $('#presets').innerHTML = Object.keys(CFG.receitas).map(k=>`<button class="chip solid ${S.nome===k?'on':''}" data-act="preset" data-k="${esc(k)}">${esc(k)}</button>`).join('');
+  ['chocolate','castanha','fruta'].forEach(c=>{ $('#ch-'+c).innerHTML = CFG.ings.filter(i=>(i.cat||'outro')===c || (c==='fruta' && i.cat==='outro')).map(i=>{ const on = S.ings.some(x=>x.n===i.n); return `<button class="chip ${on?'on':''}" data-act="ing" data-n="${esc(i.n)}">${on?'✓':'+'} ${esc(i.n)}</button>`; }).join(''); });
+  $('#ch-emb-peca').innerHTML = CFG.embs.filter(e=>e.t==='peca').map(e=>{ const on = S.embp.some(x=>x.n===e.n); return `<button class="chip ${on?'on':''}" data-act="embp" data-n="${esc(e.n)}">${on?'✓':'+'} ${esc(e.n)}</button>`; }).join('');
+  $('#caixas').innerHTML = Object.keys(CFG.caixas).map(k=>`<button class="chip solid ${S.cx===k?'on':''}" data-act="cx" data-k="${esc(k)}">${esc(k)} · ${CFG.caixas[k].p}</button>`).join('');
+  $('#ch-emb-cx').innerHTML = CFG.embs.filter(e=>e.t==='cx').map(e=>{ const on = S.embc.some(x=>x.n===e.n); return `<button class="chip ${on?'on':''}" data-act="embc" data-n="${esc(e.n)}">${on?'✓':'+'} ${esc(e.n)}</button>`; }).join('');
+  $('#mk').innerHTML = [2,2.5,3,3.5,4].map(m=>`<button class="${S.mk===m?'on':''}" data-act="mk" data-m="${m}">×${fmt(m,m%1?1:0)}</button>`).join('');
+}
+function itemRow(list,i){
+  const it = S[list][i]; const isG = it.u==='g';
+  const cost = isG ? it.q/1000*it.p : it.q*it.p;
+  return `<div class="item"><span class="nm">${it.custom?`<input class="field" style="padding:8px 12px;font-size:15px" data-l="${list}" data-i="${i}" data-f="n" value="${esc(it.n)}" placeholder="nome" aria-label="Nome do ingrediente">`:esc(it.n)}</span><button class="rm" data-act="rm" data-l="${list}" data-i="${i}" aria-label="Tirar ${esc(it.n)}">×</button>
+    <div class="row"><input class="mini" data-l="${list}" data-i="${i}" data-f="q" inputmode="decimal" value="${fmt(it.q,it.q%1?1:0)}" aria-label="Quantidade"> ${isG?'g':'un'} · R$ <input class="mini" data-l="${list}" data-i="${i}" data-f="p" inputmode="decimal" value="${fmt(it.p)}" aria-label="Preço"> ${isG?'/kg':'/un'}<span class="cost num">${brl(cost)}</span></div></div>`;
+}
+function lists(){
+  $('#ings').innerHTML = S.ings.length ? S.ings.map((x,i)=>itemRow('ings',i)).join('') : '<div class="empty">Toque nos ingredientes acima</div>';
+  $('#embp').innerHTML = S.embp.map((x,i)=>itemRow('embp',i)).join('');
+  $('#embc').innerHTML = S.embc.map((x,i)=>itemRow('embc',i)).join('');
+}
+function totals(){
+  const sumL = l => S[l].reduce((s,x)=>s+(x.u==='g'?x.q/1000*x.p:x.q*x.p),0);
+  const rend = Math.max(1,S.rend);
+  const custo = sumL('ings')/rend + sumL('embp') + (CFG.fixo||0);
+  const preco = up(custo*S.mk), lucro = preco-custo;
+  const tx = t => t<100 ? up(preco/(1-t/100)) : 0;
+  const peso = S.ings.filter(x=>x.u==='g').reduce((s,x)=>s+x.q,0)/rend;
+  $('#o-custo').textContent = brl(custo); $('#o-lucro').textContent = brl(lucro);
+  $('#o-cartao').textContent = brl(tx(CFG.txc)); $('#o-ifood').textContent = brl(tx(CFG.txi));
+  $('#mk-hint').textContent = `Preço = custo × ${fmt(S.mk,S.mk%1?1:0)}. De cada R$ 10 vendidos, R$ ${fmt(10*(1-1/S.mk))} são lucro (margem de ${fmt(100*(1-1/S.mk),0)}%).`;
+  const cxCusto = (custo - sumL('embp'))*S.pcx + sumL('embc');
+  const cxPreco = S.pcx>0 ? up(cxCusto*S.mk) : 0;
+  $('#o-cxcusto').textContent = brl(S.pcx>0?cxCusto:0); $('#o-cxpreco').textContent = brl(cxPreco);
+  if(typeof MODO!=='undefined' && MODO==='caixa'){ try{ localStorage.setItem('aure-calc',JSON.stringify(S)); }catch(e){} return; }
+  $('#b-lab').textContent = 'Cobre por peça';
+  $('#b-preco').textContent = brl(preco);
+  $('#b-dir').innerHTML = S.pcx>0
+    ? `A caixa ${esc(S.cx||'')} sai por<b class="num">${brl(cxPreco)}</b>Você lucra <strong>${brl(cxPreco-cxCusto)}</strong> por caixa`
+    : `${esc(S.nome||'Peça')} · ${fmt(peso,0)} g cada<b class="num">${brl(preco*rend)}</b>Você lucra <strong>${brl(lucro*rend)}</strong> por fornada`;
+  try{ localStorage.setItem('aure-calc',JSON.stringify(S)); }catch(e){}
+}
+function all(){ $('#nome').value = S.nome; $('#rend').value = S.rend; $('#pcx').value = S.pcx; $('#fixo').value = CFG.fixo?fmt(CFG.fixo):''; $('#tx-c').value = fmt(CFG.txc,CFG.txc%1?1:0); $('#tx-i').value = fmt(CFG.txi,CFG.txi%1?1:0); chips(); lists(); totals(); if(typeof kitUI==='function' && $('#k-base')) kitUI(); }
+
+/* ===== folha de configuração ===== */
+let ov = null, aba = 'ing', nota = null;
+function abrir(t){ aba = t; fechar(); ov = document.createElement('div'); ov.className = 'ov'; ov.addEventListener('click',e=>{ if(e.target===ov) fechar(); }); document.body.appendChild(ov); redrawSheet(); }
+function fechar(){ if(ov){ ov.remove(); ov = null; } }
+function redrawSheet(){
+  if(!ov) return;
+  const tabs = `<div class="tabs" role="group" aria-label="Seções">${[['ing','Preços'],['nota','Ler nota'],['rec','Receitas'],['kit','Kit']].map(([k,n])=>`<button class="${aba===k?'on':''}" data-act="aba" data-t="${k}">${n}</button>`).join('')}</div>`;
+  let body = '';
+  if(aba==='ing'){
+    body = `<div class="note">Preço do <b>quilo</b> para ingredientes e da <b>unidade</b> para embalagens. ${CFG.atualizado?'Última atualização: '+esc(CFG.atualizado)+'.':''}</div>
+    ${Object.keys(CATN).map(c=>{ const xs = CFG.ings.map((x,i)=>[x,i]).filter(([x])=>(x.cat||'outro')===c); return `<div class="grp">${CATN[c]}</div><div>${xs.map(([x,i])=>`<div class="prow"><input class="n" data-cf="ing" data-i="${i}" data-f="n" value="${esc(x.n)}" aria-label="Nome"><span><input class="mini" style="width:96px" data-cf="ing" data-i="${i}" data-f="p" inputmode="decimal" value="${fmt(x.p)}" aria-label="Preço do quilo de ${esc(x.n)}"><span class="unit">R$ / kg</span></span><button class="rm x" style="width:34px;height:34px;font-size:16px" data-act="del-ing" data-i="${i}" aria-label="Apagar ${esc(x.n)}">×</button></div>`).join('')}</div><button class="chip" data-act="add-ing" data-c="${c}">+ ${c==='outro'?'Outro':'Adicionar'}</button>`; }).join('')}
+    <div class="grp">Embalagens</div><div>${CFG.embs.map((e,i)=>`<div class="prow"><input class="n" data-cf="emb" data-i="${i}" data-f="n" value="${esc(e.n)}" aria-label="Nome"><span><input class="mini" style="width:96px" data-cf="emb" data-i="${i}" data-f="p" inputmode="decimal" value="${fmt(e.p)}" aria-label="Preço de ${esc(e.n)}"><span class="unit">R$ / un · ${e.t==='cx'?'caixa':'peça'}</span></span><button class="rm x" style="width:34px;height:34px;font-size:16px" data-act="del-emb" data-i="${i}" aria-label="Apagar ${esc(e.n)}">×</button></div>`).join('')}</div>
+    <div class="chips"><button class="chip" data-act="add-emb" data-t="cx">+ Embalagem de caixa</button><button class="chip" data-act="add-emb" data-t="peca">+ Embalagem de peça</button></div>
+    <div class="note">Dica: pra saber o preço da unidade, divida o valor do pacote pela quantidade. Ex.: R$ 18,90 ÷ 10 caixas = R$ 1,89.</div>
+    <button class="btn p w" data-act="salvar-cfg">Salvar preços</button>`;
+  }
+  if(aba==='nota'){
+    if(!nota) body = `<label class="drop" for="nota-f"><b>Escolher foto da nota</b><span>Pode ser mais de uma. Os preços do quilo são atualizados com o que você pagou.</span></label><input id="nota-f" type="file" accept="image/*" multiple style="display:none"><div id="nota-st"></div>`;
+    else body = `<div class="note">Confira os itens. Os que já existem têm o preço atualizado e os novos entram na lista.</div><div>${nota.map((it,k)=>{ const ant = CFG.ings.find(x=>x.n===it.alvo); const dif = ant && ant.p ? (it.kg-ant.p)/ant.p : null;
+      return `<div class="nrow"><div><b>${esc(it.nome)}</b><br><small>${fmt(it.g,0)} g · ${brl(it.valor)}${it.alvo?' → '+esc(it.alvo):' → novo'}</small></div><div style="text-align:right"><b>${brl(it.kg)}/kg</b><br>${dif===null?'<small>novo</small>':`<small class="${dif>0.005?'up':dif<-0.005?'dn':''}">${dif>0?'+':''}${fmt(dif*100,0)}% (antes ${brl(ant.p)})</small>`}</div></div>`; }).join('')}</div>
+      <button class="btn p w" data-act="nota-ok">Atualizar preços</button><button class="btn w" data-act="nota-cancel">Cancelar</button>`;
+  }
+  if(aba==='rec'){
+    body = `<div class="note">Receitas salvas aparecem no passo 1. Pra criar uma, monte os ingredientes na calculadora e toque em <b>Salvar como receita</b>.</div>
+    <div>${Object.entries(CFG.receitas).map(([k,r])=>`<div class="prow" style="grid-template-columns:1fr 34px"><div><b>${esc(k)}</b><span class="unit">rende ${r.rend} · ${r.ings.map(([n,q])=>fmt(q,0)+' g '+esc(n.toLowerCase())).join(', ')}</span></div><button class="rm x" style="width:34px;height:34px;font-size:16px" data-act="del-rec" data-k="${esc(k)}" aria-label="Apagar receita ${esc(k)}">×</button></div>`).join('')||'<div class="empty">Nenhuma receita</div>'}</div>`;
+  }
+  if(aba==='kit'){ const k = KN(); const inp = (key,v,lab,u) => `<div class="prow" style="grid-template-columns:1fr 110px"><b style="font-size:15px">${lab}</b><span><input class="mini" style="width:100px" data-kf="${key}" inputmode="decimal" value="${fmt(v,key.startsWith('g')?1:2)}" aria-label="${esc(lab)}"><span class="unit">${u}</span></span></div>`;
+    body = `<div class="note">O preço sai do custo real: (chocolate + grãos + caixa) × vezes, mais a sua mão de obra. Grão mais caro deixa a caixa mais cara.</div>
+    <div class="grp">Margem</div>${inp('mk',k.mk||3,'Vezes o custo do material','×')}
+    <div class="grp">Sua mão de obra</div>${inp('mo:hora',(k.mo||{}).hora||0,'Quanto quer ganhar por hora','R$ / hora')}${inp('mo:min',(k.mo||{}).min||0,'Tempo de uma fornada (fazer e embalar)','minutos')}${inp('mo:pecas',(k.mo||{}).pecas||21,'Peças por fornada','peças')}
+    <div class="grp">Quanto vai em cada peça</div>${inp('gChoc',k.gChoc,'Chocolate no quadradinho','gramas')}${inp('gGrao',k.gGrao,'Grãos no quadradinho (total)','gramas')}${inp('gChocB',k.gChocB||16.5,'Chocolate na barrinha','gramas')}${inp('gGraoB',k.gGraoB||4,'Grãos na barrinha (total)','gramas')}
+    <button class="btn p w" data-act="salvar-kit">Salvar preços do kit</button>`; }
+  ov.innerHTML = `<div class="sh" role="dialog" aria-modal="true" aria-label="Configurações"><div class="sh-h"><h3>${aba==='ing'?'Meus preços':aba==='nota'?'Ler nota':aba==='kit'?'Preços do kit':'Receitas'}</h3><button class="x" data-act="fechar" aria-label="Fechar">×</button></div>${tabs}${body}</div>`;
+  const f = ov.querySelector('#nota-f'); if(f) f.addEventListener('change',e=>lerNota([...e.target.files]));
+}
+function lerCfgInputs(){
+  if(!ov) return;
+  ov.querySelectorAll('[data-cf]').forEach(el=>{ const arr = el.dataset.cf==='ing'?CFG.ings:CFG.embs; const it = arr[+el.dataset.i]; if(!it) return; if(el.dataset.f==='n') it.n = el.value.trim()||it.n; else it.p = num(el.value); });
+}
+
+/* leitura de nota */
+async function shrink(file){ const img = await new Promise((res,rej)=>{ const i = new Image(); i.onload=()=>res(i); i.onerror=rej; i.src = URL.createObjectURL(file); }); const k = Math.min(1,1800/Math.max(img.width,img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width*k); c.height = Math.round(img.height*k); c.getContext('2d').drawImage(img,0,0,c.width,c.height); return await new Promise(r=>c.toBlob(r,'image/jpeg',.85)); }
+function melhorMatch(nome){
+  const toks = norm(nome).split(/[^a-z0-9]+/).filter(t=>t.length>=4 && !['pote','banda','quebr','torrado','sem','casca','com'].includes(t));
+  let best = '', sc = 0; for(const i of CFG.ings){ const n = norm(i.n); const s = toks.filter(t=>n.includes(t)).length; if(s>sc){ sc=s; best=i.n; } }
+  return best;
+}
+async function lerNota(files){
+  if(!files.length) return; const st = $('#nota-st'); st.innerHTML = '<div class="spin"></div><p style="text-align:center;color:var(--soft)">lendo a nota…</p>';
+  let sample = null; try{ sample = window.claude ? await claude.use('sample') : null; }catch(e){}
+  try{
+    const lim = sample && sample.limits ? await sample.limits() : null;
+    if(!sample || (lim && !lim.images)) throw {code:'not_granted'};
+    const images = []; for(const f of files) images.push(await shrink(f));
+    const prompt = `Você lê cupons e recibos de compras de uma chocolateria artesanal no Brasil. Responda SOMENTE com JSON:
+{"itens":[{"nome":"nome curto do produto","categoria":"chocolate|castanha|fruta|outro|embalagem","gramas":0,"unidades":0,"valor":0}]}
+Regras: produto por kg -> gramas (0,216 kg = 216). Produto com peso no nome (ex.: 2,01kg) -> gramas x unidades. Embalagens, caixas, fitas, adesivos, papel e formas: categoria "embalagem" com unidades (gramas 0). valor = valor final pago pela linha, já com desconto da linha; desconto no subtotal: distribua proporcionalmente. Junte linhas repetidas do mesmo produto.`;
+    let v; if(typeof sample.json==='function') v = await sample.json(prompt,{images,modelTier:'default'}); else { const r = await sample(prompt,{images,modelTier:'default'}); const t = r.text||''; v = JSON.parse(t.slice(t.indexOf('{'),t.lastIndexOf('}')+1)); }
+    const its = (v.itens||[]).filter(i=>i.categoria!=='embalagem' && i.gramas>0 && i.valor>0).map(i=>({nome:String(i.nome||''),cat:CATN[i.categoria]?i.categoria:'outro',g:Number(i.gramas),valor:Number(i.valor),kg:Number(i.valor)/Number(i.gramas)*1000,alvo:melhorMatch(i.nome)}));
+    const embs = (v.itens||[]).filter(i=>i.categoria==='embalagem');
+    if(!its.length && !embs.length) throw {code:'vazio'};
+    nota = its; if(embs.length) toast(embs.length+' embalagem(ns) na nota: lance o preço da unidade em Meus preços.');
+    redrawSheet();
+  }catch(e){ st.innerHTML = `<div class="note">${e&&e.code==='not_granted'?'A leitura por foto só funciona com a calculadora aberta no Claude. Atualize os preços em Meus preços.':e&&e.code==='vazio'?'Não encontrei ingredientes na foto. Tente uma foto mais reta e nítida.':'Não consegui ler a nota. Tente outra foto.'}</div>`; }
+}
+
+/* ===== ações ===== */
+const toggle = (list,n,price,u) => { const ix = S[list].findIndex(x=>x.n===n); if(ix>=0) S[list].splice(ix,1); else S[list].push({n,q:u==='g'?10:1,p:price,u}); chips(); lists(); totals(); };
+const hoje = () => new Date().toLocaleDateString('pt-BR');
+document.addEventListener('click',async e=>{
+  const b = e.target.closest('[data-act]'); if(!b) return; const d = b.dataset;
+  switch(d.act){
+    case 'rend': S.rend = Math.max(1,S.rend+(+d.d)); $('#rend').value = S.rend; totals(); break;
+    case 'pcx': S.pcx = Math.max(0,S.pcx+(+d.d)); $('#pcx').value = S.pcx; totals(); break;
+    case 'preset': { const p = CFG.receitas[d.k]; if(!p) break; S.nome = d.k; S.rend = p.rend; S.ings = p.ings.map(([n,q])=>({n,q,p:priceOf(n),u:'g'})); all(); break; }
+    case 'ing': toggle('ings',d.n,priceOf(d.n),'g'); break;
+    case 'embp': toggle('embp',d.n,embPrice(d.n),'un'); break;
+    case 'embc': toggle('embc',d.n,embPrice(d.n),'un'); break;
+    case 'novo': S.ings.push({n:'',q:10,p:0,u:'g',custom:true}); lists(); totals(); { const f = document.querySelector('#ings .item:last-child input.field'); if(f) f.focus(); } break;
+    case 'rm': S[d.l].splice(+d.i,1); chips(); lists(); totals(); break;
+    case 'mk': S.mk = +d.m; chips(); totals(); break;
+    case 'cx': { const c = CFG.caixas[d.k]; S.cx = d.k; S.pcx = c.p; S.embc = c.e.map(([n,q])=>({n,q,p:embPrice(n),u:'un'})); all(); break; }
+    case 'salvar-rec': { const nome = (S.nome||'').trim(); if(!nome){ toast('Dê um nome ao chocolate no passo 1'); $('#nome').focus(); break; }
+      const ings = S.ings.filter(x=>x.n && x.q>0); if(!ings.length){ toast('Adicione ingredientes primeiro'); break; }
+      ings.forEach(x=>{ if(x.custom && !CFG.ings.some(i=>i.n===x.n)) CFG.ings.push({cat:'outro',n:x.n,p:x.p}); x.custom = false; });
+      CFG.receitas[nome] = {rend:S.rend,ings:ings.map(x=>[x.n,x.q])}; await salvarCfg(); chips(); lists(); toast('Receita “'+nome+'” salva'); break; }
+    case 'cfg': abrir(d.t); break;
+    case 'aba': lerCfgInputs(); aba = d.t; redrawSheet(); break;
+    case 'fechar': fechar(); break;
+    case 'add-ing': lerCfgInputs(); CFG.ings.push({cat:d.c,n:'Novo ingrediente',p:0}); redrawSheet(); break;
+    case 'add-emb': lerCfgInputs(); CFG.embs.push({n:'Nova embalagem',p:0,t:d.t}); redrawSheet(); break;
+    case 'del-ing': lerCfgInputs(); CFG.ings.splice(+d.i,1); redrawSheet(); break;
+    case 'del-emb': lerCfgInputs(); CFG.embs.splice(+d.i,1); redrawSheet(); break;
+    case 'del-rec': delete CFG.receitas[d.k]; await salvarCfg(); chips(); redrawSheet(); break;
+    case 'salvar-cfg': lerCfgInputs(); CFG.atualizado = hoje(); await salvarCfg(); syncPrecos(); all(); fechar(); toast('Preços salvos'); break;
+    case 'nota-cancel': nota = null; redrawSheet(); break;
+    case 'nota-ok': nota.forEach(it=>{ const ex = CFG.ings.find(x=>x.n===it.alvo); if(ex) ex.p = Math.round(it.kg*100)/100; else CFG.ings.push({cat:it.cat,n:it.nome,p:Math.round(it.kg*100)/100}); });
+      nota = null; CFG.atualizado = hoje(); await salvarCfg(); syncPrecos(); all(); aba = 'ing'; redrawSheet(); toast('Preços atualizados'); break;
+  }
+});
+document.addEventListener('input',e=>{
+  const t = e.target, d = t.dataset;
+  if(d.l){ const it = S[d.l][+d.i]; if(!it) return; if(d.f==='n') it.n = t.value; else it[d.f] = num(t.value);
+    const c = t.closest('.item').querySelector('.cost'); if(c) c.textContent = brl(it.u==='g'?it.q/1000*it.p:it.q*it.p); totals(); return; }
+  if(t.id==='nome'){ S.nome = t.value; totals(); }
+  if(t.id==='rend'){ S.rend = Math.max(1,Math.round(num(t.value))); totals(); }
+  if(t.id==='pcx'){ S.pcx = Math.max(0,Math.round(num(t.value))); totals(); }
+  if(t.id==='fixo'){ CFG.fixo = num(t.value); totals(); clearTimeout(window._sv); window._sv = setTimeout(salvarCfg,800); }
+  if(t.id==='tx-c'){ CFG.txc = num(t.value); totals(); clearTimeout(window._sv); window._sv = setTimeout(salvarCfg,800); }
+  if(t.id==='tx-i'){ CFG.txi = num(t.value); totals(); clearTimeout(window._sv); window._sv = setTimeout(salvarCfg,800); }
+});
+
+/* ===== kit de 5 · monte o seu ===== */
+let K = {base:'Chocolate meio amargo', graos:['Castanha de caju','Amêndoa','Uva passa'], t:0, nome:'Clássica'};
+let MODO = 'caixa'; try{ MODO = localStorage.getItem('aure-modo')||'caixa'; }catch(e){}
+function setModo(m){ MODO = m; try{ localStorage.setItem('aure-modo',m); }catch(e){} $('#m-caixa').hidden = m!=='caixa'; $('#m-receita').hidden = m!=='receita'; $('#hbtns').hidden = m==='caixa'; document.querySelectorAll('[data-act="modo"]').forEach(b=>b.classList.toggle('on',b.dataset.m===m)); $('#h-tit').innerHTML = m==='caixa' ? 'Quanto cobrar <em>pela caixa?</em>' : 'Quanto custa <em>a sua receita?</em>'; $('#h-sub').textContent = m==='caixa' ? 'Escolha o tamanho e o sabor. O preço aparece na hora.' : 'Preencha os passos pra ver o custo de cada peça.'; if(m==='caixa') kitTot(); else totals(); }
+try{ const k = JSON.parse(localStorage.getItem('aure-kit')||'null'); if(k) K = Object.assign(K,k); }catch(e){}
+const grs = () => CFG.ings.filter(i=>i.cat==='castanha'||i.cat==='fruta');
+const near90 = (v,c) => { const f = Math.floor(v+1e-9); let best = (v <= f+0.9+1e-9) ? f+0.9 : f+1.9; while(best < c*3-0.01) best += 1; return Math.round(best*100)/100; };
+const tamOf = () => { const k = KN(); const ts = k.tam||CFG_PAD.kit.tam; return ts[Math.min(K.t||0,ts.length-1)]; };
+function pecaDe(base,graos,barra,T){ const k = KN(); const gc = (T&&T.gc) || (barra ? (k.gChocB||16.5) : k.gChoc), gg = (T&&T.gg) || (barra ? (k.gGraoB||4) : k.gGrao); const gs = graos.length ? graos : []; return { c:(gc*priceOf(base) + (gs.length ? gs.reduce((x,g)=>x+(gg/gs.length)*priceOf(g),0) : 0))/1000 }; }
+function kitCalc(){
+  if(!(KN().base||{})[K.base]) K.base = Object.keys(KN().base)[0];
+  const k = KN(), T = tamOf(), n = T.livre ? Math.max(11, Math.round(K.q||12)) : T.q, barra = /barr/i.test(T.n);
+  let pc;
+  if(K.nome==='Sortida'){ const xs = Object.values(KITS).map(v=>pecaDe(K.base,v.g.filter(g=>CFG.ings.some(i=>i.n===g && i.p>0)),barra,T)); pc = {c:Math.max(...xs.map(x=>x.c))}; }
+  else pc = pecaDe(K.base,K.graos.filter(g=>CFG.ings.some(i=>i.n===g && i.p>0)),barra,T);
+  const emb = (T.emb||[]).reduce((s,e)=>s+embPrice(e),0) + n*(T.peca||[]).reduce((s,e)=>s+embPrice(e),0);
+  const custo = n*pc.c + emb;
+  const mo = Object.assign({hora:0,min:0,pecas:21}, k.mo||{});
+  const moKit = n*(T.mo!=null ? T.mo : (mo.pecas>0 ? mo.hora*mo.min/60/mo.pecas : 0));
+  const preco = near90(custo*(k.mk||3) + moKit, 0);
+  return {custo,preco,k,T,moKit,n};
+}
+function descKit(){ if(K.nome==='Sortida') return 'Sortida: um de cada sabor da casa, '+K.base.replace('Chocolate ','').toLowerCase(); if(!K.nome) return 'Monte o seu: '+K.base.replace('Chocolate ','').toLowerCase()+(K.graos.length?' com '+K.graos.map(g=>g.toLowerCase()).join(', '):''); const v = KITS[K.nome]; return K.nome+': '+K.base.replace('Chocolate ','').toLowerCase()+' com '+v.g.map(g=>g.toLowerCase()).join(', '); }
+function kitUI(){
+  const k = KN(), ts = k.tam||CFG_PAD.kit.tam;
+  const tb = (filt,id) => { $(id).innerHTML = ts.map((t,i)=>[t,i]).filter(([t])=>filt(t)).map(([t,i])=>`<button class="chip big ${(K.t||0)===i?'on':''}" data-act="k-t" data-i="${i}">${t.lab||(t.livre?'+10':t.q)}</button>`).join(''); };
+  tb(t=>!/barr/i.test(t.n),'#t-q'); tb(t=>/barrinh/i.test(t.n),'#t-b'); tb(t=>/55 g/i.test(t.n),'#t-t');
+  const T0 = tamOf(); $('#t-livre').hidden = !T0.livre; $('#k-q').value = Math.max(11, Math.round(K.q||12));
+  $('#k-presets').innerHTML = [...Object.keys(KITS),'Sortida'].map(n=>`<button class="chip solid ${K.nome===n?'on':''}" data-act="k-kit" data-k="${esc(n)}">${esc(n)}</button>`).join('') + `<button class="chip solid ${!K.nome?'on':''}" data-act="k-kit" data-k="">✎ Monte o seu</button>`;
+  $('#monte').hidden = !!K.nome;
+  $('#k-base').innerHTML = Object.keys(k.base).map(n=>`<button class="chip ${K.base===n?'on':''}" data-act="k-base" data-n="${esc(n)}">${esc(n.replace('Chocolate ',''))}</button>`).join('');
+  $('#k-graos').innerHTML = grs().filter(g=>g.p>0).map(g=>{ const on = K.graos.includes(g.n); return `<button class="chip ${on?'on':''}" data-act="k-grao" data-n="${esc(g.n)}">${on?'✓':'+'} ${esc(g.n)}</button>`; }).join('');
+  kitTot();
+}
+function kitTot(){
+  const {custo,preco,T,moKit,n} = kitCalc();
+  const tn = T.livre ? n+' '+T.n.replace(/ \(.*\)/,'') : T.n;
+  $('#k-desc').textContent = descKit();
+  $('#k-det').textContent = `Caixa com ${tn}`;
+  $('#k-preco').textContent = brl(preco);
+  $('#k-custo').textContent = brl(custo); $('#k-mov').textContent = brl(moKit); $('#k-lucro').textContent = brl(preco-custo-moKit);
+  const al = $('#k-alerta'); const x = custo>0 ? preco/custo : 0;
+  if(!K.nome && !K.graos.length){ al.hidden = false; al.innerHTML = 'Toque nos grãos que o cliente quer.'; }
+  else if(x && x<3){ al.hidden = false; al.innerHTML = `Atenção: está saindo só ${fmt(x,1)} vezes o gasto com material.`; }
+  else al.hidden = true;
+  if(MODO==='caixa'){ $('#b-preco').textContent = brl(preco); $('#b-lab').textContent = 'Cobre do cliente'; $('#b-dir').innerHTML = `${esc(tn)}<b>${esc(K.nome||'Monte o seu')}</b>Seu trabalho + marca: <strong>${brl(preco-custo)}</strong>`; }
+  try{ localStorage.setItem('aure-kit',JSON.stringify(K)); }catch(e){}
+}
+function tabelaCliente(){
+  const k = KN(), ts = k.tam||CFG_PAD.kit.tam; const L = []; const s0 = K;
+  const pk = (n,ti) => { K = n==='Sortida' ? {nome:'Sortida',base:'Chocolate meio amargo',graos:[],t:ti} : {nome:n,base:KITS[n].b,graos:KITS[n].g,t:ti}; const p = kitCalc().preco; K = s0; return p; };
+  L.push(`*Chocolates ${CFG.marca||'Aure'}* 🤎`, '');
+  [...Object.keys(KITS),'Sortida'].forEach(n=>{ L.push(n==='Sortida' ? '*Sortida* (um pouco de cada)' : `*${n}* (${KITS[n].b.replace('Chocolate ','').toLowerCase()} com ${KITS[n].g.map(g=>g.toLowerCase()).join(', ')})`); L.push(ts.map((t,i)=>`${t.n}: ${brl(pk(n,i))}`).join(' · '), ''); });
+  L.push('Encomendas com 50% de entrada via Pix. Retirada no local.');
+  K = s0; return L.join('\n');
+}
+document.addEventListener('click',async e=>{
+  const b = e.target.closest('[data-act]'); if(!b) return; const d = b.dataset;
+  if(d.act==='modo'){ setModo(d.m); window.scrollTo(0,0); }
+  if(d.act==='kq'){ K.q = Math.max(11,(K.q||12)+(+d.d)); kitUI(); }
+  if(d.act==='k-msg'){ const {preco,T,n} = kitCalc(); const t = `Caixa com ${T.livre ? n+' '+T.n.replace(/ \(.*\)/,'') : T.n}, ${descKit()}: ${brl(preco)} 🤎\nPra confirmar, é só fazer o Pix de 50% (${brl(preco/2)}).`; try{ await navigator.clipboard.writeText(t); toast('Mensagem copiada'); }catch(err){ prompt('Copie a mensagem:',t); } }
+  if(d.act==='k-kit'){ K.nome = d.k; if(d.k && KITS[d.k]){ K.graos = KITS[d.k].g.filter(g=>CFG.ings.some(i=>i.n===g)); } kitUI(); }
+  if(d.act==='k-base'){ K.base = d.n; kitUI(); }
+  if(d.act==='k-grao'){ K.nome = ''; K.graos = K.graos.includes(d.n) ? K.graos.filter(g=>g!==d.n) : [...K.graos,d.n]; kitUI(); }
+  if(d.act==='k-t'){ K.t = +d.i; kitUI(); }
+  if(d.act==='k-copiar'){ const t = tabelaCliente(); try{ await navigator.clipboard.writeText(t); toast('Tabela copiada. É só colar no WhatsApp'); }catch(err){ prompt('Copie a tabela:',t); } }
+  if(d.act==='salvar-kit'){ const k = KN(); ov.querySelectorAll('[data-kf]').forEach(el=>{ const [a,b2] = el.dataset.kf.split(':'); const v = num(el.value); if(a==='mk'){ k.mk = v; } else if(a==='mo'){ k.mo = Object.assign({hora:0,min:0,pecas:21},k.mo||{}); k.mo[b2] = v; } else if(a==='tam'){ k.tam = k.tam||clone(CFG_PAD.kit.tam); k.tam[+b2].taxa = v; } else if(b2) k[a][b2] = v; else k[a] = v; }); CFG.kit = k; await salvarCfg(); kitUI(); fechar(); toast('Preços do kit salvos'); }
+});
+document.addEventListener('input',e=>{ if(e.target.id==='k-q'){ K.q = Math.max(11,Math.round(num(e.target.value))||11); kitTot(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') fechar(); });
+all();
+setModo(MODO);
+conectar();
+
+/* altura automática quando está dentro do app */
+if(window.parent!==window){ const env = () => { try{ window.parent.postMessage({calcAltura:document.documentElement.scrollHeight},'*'); }catch(e){} }; new ResizeObserver(env).observe(document.body); setInterval(env,1500); }
+if(window.parent!==window) setTimeout(()=>{ try{ window.parent.postMessage({calcCfg:clone(CFG)},'*'); }catch(e){} },600);
+</script>
+</body>
+</html>
