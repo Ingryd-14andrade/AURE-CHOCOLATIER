@@ -283,6 +283,7 @@ footer{background:var(--vinho-fundo);border-top:1px solid rgba(201,147,90,.18);p
 .gchip{border:1px solid rgba(233,197,154,.4);background:transparent;color:#FFF6EC;border-radius:999px;padding:10px 16px;font-size:14.5px;transition:all .35s var(--ease)}
 .gchip.on{background:var(--ouro-grad);color:var(--vinho-fundo);border-color:transparent;transform:translateY(-1px)}
 .gchip.on::before{content:"✓ "}
+.gchip[data-ord]:not([data-ord=""])::after{content:" · " attr(data-ord);font-size:12px;opacity:.85}
 .mix-obs{font-size:12.5px;color:#C9AFA0;margin-top:12px;line-height:1.5}
 .op.monte-op{border-style:dashed;border-color:rgba(233,197,154,.6)}
 .sbi.monte-it{border-top:1px dashed rgba(154,106,63,.5)}
@@ -374,8 +375,10 @@ footer{background:var(--vinho-fundo);border-top:1px solid rgba(201,147,90,.18);p
       <div class="grupo"><span class="rotulo">1 · Formato</span><div class="opcoes" id="g-fmt"><button class="op" data-f="q">Quadradinhos<small>≈ 19 g cada</small></button><button class="op" data-f="b">Barrinhas<small>≈ 20 g, embaladas uma a uma</small></button><button class="op" data-f="t">Barra 55 g<small>Tablete inteiro, com saquinho e etiqueta</small></button></div></div>
       <div class="grupo"><span class="rotulo">2 · Quantidade</span><div class="opcoes" id="g-q"><button class="op num" data-q="4">4</button><button class="op num" data-q="6">6</button><button class="op num" data-q="10">10</button><button class="op num" data-q="+">+10</button></div>
         <div class="qtd" id="qtd"><button data-d="-1" aria-label="Menos">−</button><b id="qn">12</b><button data-d="1" aria-label="Mais">+</button><span style="color:var(--suave);font-size:14px">chocolates · valor confirmado no WhatsApp</span></div></div>
-      <div class="grupo"><span class="rotulo">3 · Chocolate</span><div class="opcoes" id="g-c"><button class="op" data-c="40">Meio amargo 40%<small>Equilibrado e cremoso</small></button><button class="op" data-c="75">Amargo 75%<small>Intenso, muito cacau</small></button><button class="op" data-c="br">Branco<small>Doce, cremoso e suave</small></button></div></div>
-      <div class="grupo"><span class="rotulo">4 · Sabor</span><div class="opcoes" id="g-s"><button class="op sab" data-s="Clássica">Clássica<small>Castanha de caju, amêndoa e uva passa</small></button><button class="op sab" data-s="Avelã">Avelã<small>Avelã e nozes</small></button><button class="op sab" data-s="Tropical">Tropical<small>Coco, damasco e castanha de caju</small></button><button class="op sab" data-s="Noir">Noir<small>Amêndoa e blueberry</small></button><button class="op sab" data-s="Brasil">Brasil<small>Castanha-do-pará e goji berry</small></button><button class="op sab" data-s="Pistache">Pistache<small>Pistache, castanha-do-pará e blueberry</small></button><button class="op sab" data-s="Dourada">Dourada<small>Damasco e castanha de caju</small></button><button class="op sab" data-s="Mediterrânea">Mediterrânea<small>Uva passa, pistache e nozes</small></button><button class="op sab" data-s="Sortida">Sortida<small>Um chocolate de cada sabor da casa</small></button><button class="op sab monte-op" data-s="Monte o seu">✦ Monte o seu<small>Você escolhe os grãos</small></button></div>
+      <div class="grupo"><span class="rotulo">3 · Chocolate</span><div class="opcoes" id="g-c"><button class="op" data-c="40">Meio amargo 40%<small>Equilibrado e cremoso</small></button><button class="op" data-c="75">Amargo 75%<small>Intenso, muito cacau</small></button><button class="op" data-c="br">Branco<small>Doce, cremoso e suave</small></button><button class="op" data-c="mx" id="op-mx">Misto<small id="op-mx-s">Metade de cada chocolate</small></button></div>
+        <div id="c2" class="mix"><div class="mix-cab"><span id="c2-t">Escolha os 2 chocolates</span><small id="c2-n"></small></div><div class="gchips"><button class="gchip" data-c2="40">Meio amargo 40%</button><button class="gchip" data-c2="75">Amargo 75%</button><button class="gchip" data-c2="br">Branco</button></div><p class="mix-obs" id="c2-obs">Metade da caixa em cada chocolate. O preço segue o chocolate mais nobre.</p></div></div>
+      <div class="grupo"><span class="rotulo">4 · Sabor</span><div class="opcoes" id="g-s"><button class="op sab" data-s="Clássica">Clássica<small>Castanha de caju, amêndoa e uva passa</small></button><button class="op sab" data-s="Avelã">Avelã<small>Avelã e nozes</small></button><button class="op sab" data-s="Tropical">Tropical<small>Coco, damasco e castanha de caju</small></button><button class="op sab" data-s="Noir">Noir<small>Amêndoa e blueberry</small></button><button class="op sab" data-s="Brasil">Brasil<small>Castanha-do-pará e goji berry</small></button><button class="op sab" data-s="Pistache">Pistache<small>Pistache, castanha-do-pará e blueberry</small></button><button class="op sab" data-s="Dourada">Dourada<small>Damasco e castanha de caju</small></button><button class="op sab" data-s="Mediterrânea">Mediterrânea<small>Uva passa, pistache e nozes</small></button><button class="op sab" data-s="Sortida">Sortida<small>Um chocolate de cada sabor da casa</small></button><button class="op sab" data-s="Meio a meio" id="op-mm">Meio a meio<small id="op-mm-s">Dois sabores na mesma caixa</small></button><button class="op sab monte-op" data-s="Monte o seu">✦ Monte o seu<small>Você escolhe os grãos</small></button></div>
+        <div id="s2" class="mix"><div class="mix-cab"><span id="s2-t">Escolha os 2 sabores</span><small id="s2-n"></small></div><div class="gchips"><button class="gchip" data-s2="Clássica">Clássica</button><button class="gchip" data-s2="Avelã">Avelã</button><button class="gchip" data-s2="Tropical">Tropical</button><button class="gchip" data-s2="Noir">Noir</button><button class="gchip" data-s2="Brasil">Brasil</button><button class="gchip" data-s2="Pistache">Pistache</button><button class="gchip" data-s2="Dourada">Dourada</button><button class="gchip" data-s2="Mediterrânea">Mediterrânea</button></div><p class="mix-obs" id="s2-obs">Metade da caixa de cada sabor. O preço segue o sabor mais caro.</p></div>
         <div id="mix" class="mix"><div class="mix-cab"><span>Escolha os grãos</span><small id="mix-n">Escolha até 4</small></div><div class="gchips"><button class="gchip" data-g="Amendoim">Amendoim</button><button class="gchip" data-g="Castanha de caju">Castanha de caju</button><button class="gchip" data-g="Amêndoa">Amêndoa</button><button class="gchip" data-g="Avelã">Avelã</button><button class="gchip" data-g="Castanha-do-pará">Castanha-do-pará</button><button class="gchip" data-g="Nozes">Nozes</button><button class="gchip" data-g="Pistache">Pistache</button><button class="gchip" data-g="Damasco">Damasco</button><button class="gchip" data-g="Blueberry">Blueberry</button><button class="gchip" data-g="Goji berry">Goji berry</button><button class="gchip" data-g="Uva passa">Uva passa</button><button class="gchip" data-g="Coco">Coco</button></div><p class="mix-obs">Os grãos escolhidos vão em todas as peças da caixa. Grãos mais nobres, como pistache e blueberry, deixam a caixa um pouco mais cara.</p></div></div>
     </div>
     <aside class="recibo" aria-live="polite">
@@ -459,7 +462,7 @@ void main(){
   /* ================= configurador ================= */
   var WHATS = '5527981462361';  // número com DDD, só dígitos. Ex.: 5527999999999
   var D = {"p": {"Clássica|q4|40": 22.9, "Clássica|q4|75": 33.9, "Clássica|q4|br": 28.9, "Clássica|q6|40": 37.9, "Clássica|q6|75": 54.9, "Clássica|q6|br": 47.9, "Clássica|q10|40": 52.9, "Clássica|q10|75": 80.9, "Clássica|q10|br": 68.9, "Clássica|b4|40": 31.9, "Clássica|b4|75": 43.9, "Clássica|b4|br": 38.9, "Clássica|b6|40": 36.9, "Clássica|b6|75": 54.9, "Clássica|b6|br": 46.9, "Clássica|b10|40": 59.9, "Clássica|b10|75": 87.9, "Clássica|b10|br": 76.9, "Clássica|t1|40": 13.9, "Clássica|t1|75": 22.9, "Clássica|t1|br": 18.9, "Clássica|t2|40": 38.9, "Clássica|t2|75": 54.9, "Clássica|t2|br": 48.9, "Avelã|q4|40": 23.9, "Avelã|q4|75": 34.9, "Avelã|q4|br": 29.9, "Avelã|q6|40": 39.9, "Avelã|q6|75": 55.9, "Avelã|q6|br": 48.9, "Avelã|q10|40": 55.9, "Avelã|q10|75": 82.9, "Avelã|q10|br": 70.9, "Avelã|b4|40": 32.9, "Avelã|b4|75": 44.9, "Avelã|b4|br": 39.9, "Avelã|b6|40": 38.9, "Avelã|b6|75": 55.9, "Avelã|b6|br": 48.9, "Avelã|b10|40": 61.9, "Avelã|b10|75": 90.9, "Avelã|b10|br": 78.9, "Avelã|t1|40": 14.9, "Avelã|t1|75": 22.9, "Avelã|t1|br": 19.9, "Avelã|t2|40": 39.9, "Avelã|t2|75": 55.9, "Avelã|t2|br": 48.9, "Tropical|q4|40": 23.9, "Tropical|q4|75": 33.9, "Tropical|q4|br": 29.9, "Tropical|q6|40": 38.9, "Tropical|q6|75": 54.9, "Tropical|q6|br": 48.9, "Tropical|q10|40": 54.9, "Tropical|q10|75": 81.9, "Tropical|q10|br": 69.9, "Tropical|b4|40": 32.9, "Tropical|b4|75": 43.9, "Tropical|b4|br": 38.9, "Tropical|b6|40": 37.9, "Tropical|b6|75": 54.9, "Tropical|b6|br": 47.9, "Tropical|b10|40": 60.9, "Tropical|b10|75": 89.9, "Tropical|b10|br": 77.9, "Tropical|t1|40": 14.9, "Tropical|t1|75": 22.9, "Tropical|t1|br": 19.9, "Tropical|t2|40": 38.9, "Tropical|t2|75": 55.9, "Tropical|t2|br": 48.9, "Noir|q4|40": 24.9, "Noir|q4|75": 34.9, "Noir|q4|br": 30.9, "Noir|q6|40": 40.9, "Noir|q6|75": 56.9, "Noir|q6|br": 49.9, "Noir|q10|40": 56.9, "Noir|q10|75": 83.9, "Noir|q10|br": 72.9, "Noir|b4|40": 33.9, "Noir|b4|75": 44.9, "Noir|b4|br": 40.9, "Noir|b6|40": 39.9, "Noir|b6|75": 56.9, "Noir|b6|br": 49.9, "Noir|b10|40": 63.9, "Noir|b10|75": 92.9, "Noir|b10|br": 80.9, "Noir|t1|40": 14.9, "Noir|t1|75": 23.9, "Noir|t1|br": 19.9, "Noir|t2|40": 39.9, "Noir|t2|75": 56.9, "Noir|t2|br": 49.9, "Brasil|q4|40": 22.9, "Brasil|q4|75": 33.9, "Brasil|q4|br": 28.9, "Brasil|q6|40": 37.9, "Brasil|q6|75": 54.9, "Brasil|q6|br": 47.9, "Brasil|q10|40": 52.9, "Brasil|q10|75": 80.9, "Brasil|q10|br": 68.9, "Brasil|b4|40": 31.9, "Brasil|b4|75": 43.9, "Brasil|b4|br": 38.9, "Brasil|b6|40": 36.9, "Brasil|b6|75": 54.9, "Brasil|b6|br": 46.9, "Brasil|b10|40": 59.9, "Brasil|b10|75": 87.9, "Brasil|b10|br": 76.9, "Brasil|t1|40": 13.9, "Brasil|t1|75": 22.9, "Brasil|t1|br": 18.9, "Brasil|t2|40": 38.9, "Brasil|t2|75": 54.9, "Brasil|t2|br": 48.9, "Pistache|q4|40": 25.9, "Pistache|q4|75": 36.9, "Pistache|q4|br": 31.9, "Pistache|q6|40": 42.9, "Pistache|q6|75": 58.9, "Pistache|q6|br": 51.9, "Pistache|q10|40": 60.9, "Pistache|q10|75": 87.9, "Pistache|q10|br": 76.9, "Pistache|b4|40": 34.9, "Pistache|b4|75": 46.9, "Pistache|b4|br": 41.9, "Pistache|b6|40": 41.9, "Pistache|b6|75": 58.9, "Pistache|b6|br": 51.9, "Pistache|b10|40": 67.9, "Pistache|b10|75": 96.9, "Pistache|b10|br": 84.9, "Pistache|t1|40": 15.9, "Pistache|t1|75": 23.9, "Pistache|t1|br": 20.9, "Pistache|t2|40": 41.9, "Pistache|t2|75": 57.9, "Pistache|t2|br": 50.9, "Dourada|q4|40": 23.9, "Dourada|q4|75": 34.9, "Dourada|q4|br": 29.9, "Dourada|q6|40": 38.9, "Dourada|q6|75": 55.9, "Dourada|q6|br": 48.9, "Dourada|q10|40": 54.9, "Dourada|q10|75": 81.9, "Dourada|q10|br": 70.9, "Dourada|b4|40": 32.9, "Dourada|b4|75": 43.9, "Dourada|b4|br": 39.9, "Dourada|b6|40": 38.9, "Dourada|b6|75": 55.9, "Dourada|b6|br": 48.9, "Dourada|b10|40": 61.9, "Dourada|b10|75": 89.9, "Dourada|b10|br": 78.9, "Dourada|t1|40": 14.9, "Dourada|t1|75": 22.9, "Dourada|t1|br": 19.9, "Dourada|t2|40": 38.9, "Dourada|t2|75": 55.9, "Dourada|t2|br": 48.9, "Mediterrânea|q4|40": 24.9, "Mediterrânea|q4|75": 35.9, "Mediterrânea|q4|br": 30.9, "Mediterrânea|q6|40": 40.9, "Mediterrânea|q6|75": 56.9, "Mediterrânea|q6|br": 49.9, "Mediterrânea|q10|40": 56.9, "Mediterrânea|q10|75": 84.9, "Mediterrânea|q10|br": 72.9, "Mediterrânea|b4|40": 33.9, "Mediterrânea|b4|75": 44.9, "Mediterrânea|b4|br": 40.9, "Mediterrânea|b6|40": 39.9, "Mediterrânea|b6|75": 56.9, "Mediterrânea|b6|br": 49.9, "Mediterrânea|b10|40": 63.9, "Mediterrânea|b10|75": 92.9, "Mediterrânea|b10|br": 80.9, "Mediterrânea|t1|40": 14.9, "Mediterrânea|t1|75": 23.9, "Mediterrânea|t1|br": 19.9, "Mediterrânea|t2|40": 39.9, "Mediterrânea|t2|75": 56.9, "Mediterrânea|t2|br": 49.9, "Sortida|q4|40": 25.9, "Sortida|q4|75": 36.9, "Sortida|q4|br": 31.9, "Sortida|q6|40": 42.9, "Sortida|q6|75": 58.9, "Sortida|q6|br": 51.9, "Sortida|q10|40": 60.9, "Sortida|q10|75": 87.9, "Sortida|q10|br": 76.9, "Sortida|b4|40": 34.9, "Sortida|b4|75": 46.9, "Sortida|b4|br": 41.9, "Sortida|b6|40": 41.9, "Sortida|b6|75": 58.9, "Sortida|b6|br": 51.9, "Sortida|b10|40": 67.9, "Sortida|b10|75": 96.9, "Sortida|b10|br": 84.9, "Sortida|t1|40": 15.9, "Sortida|t1|75": 23.9, "Sortida|t1|br": 20.9, "Sortida|t2|40": 41.9, "Sortida|t2|75": 57.9, "Sortida|t2|br": 50.9}, "s": [["Clássica", "Castanha de caju, amêndoa e uva passa"], ["Avelã", "Avelã e nozes"], ["Tropical", "Coco, damasco e castanha de caju"], ["Noir", "Amêndoa e blueberry"], ["Brasil", "Castanha-do-pará e goji berry"], ["Pistache", "Pistache, castanha-do-pará e blueberry"], ["Dourada", "Damasco e castanha de caju"], ["Mediterrânea", "Uva passa, pistache e nozes"], ["Sortida", "Um chocolate de cada sabor da casa"]]};
-  var st = {f:'q', q:4, c:'40', s:'Sortida', n:12};
+  var st = {f:'q', q:4, c:'40', s:'Sortida', n:12, c2:['40','br'], s2:[]};
   var brl = function(v){ return 'R$ ' + v.toFixed(2).replace('.',','); };
   var $ = function(s){ return document.querySelector(s); };
   function nome(f,q){ return f==='q' ? (q>1?'quadradinhos':'quadradinho') : f==='t' ? (q>1?'barras de 55 g':'barra de 55 g') : (q>1?'barrinhas':'barrinha'); }
@@ -483,14 +486,33 @@ void main(){
     var mat = st.q*(c + (barra?MIX.peB:0)) + MIX[st.f][st.q];
     return Math.round(up90(mat*MIX.mk + st.q*MIX.mo[st.f])*100)/100;
   }
-  function preco(){ if (st.s==='Monte o seu') return precoMix(); return st.q==='+' ? null : D.p[st.s+'|'+st.f+st.q+'|'+st.c]; }
+  function chocs(){ return st.c==='mx' ? st.c2.slice() : [st.c]; }
+  function sabs(){ return st.s==='Meio a meio' ? st.s2.slice() : [st.s]; }
+  function dupla(){ return st.f==='t' && st.q===2; }
+  function preco(){
+    if (st.c==='mx' && st.c2.length<2) return null;
+    if (st.s==='Meio a meio' && st.s2.length<2) return null;
+    var cs = chocs(), m = 0, c0 = st.c;
+    if (st.s==='Monte o seu'){ cs.forEach(function(c){ st.c = c; var v = precoMix(); if (v) m = Math.max(m,v); }); st.c = c0; return m || null; }
+    if (st.q==='+') return null;
+    sabs().forEach(function(s){ cs.forEach(function(c){ var v = D.p[s+'|'+st.f+st.q+'|'+c]; if (v) m = Math.max(m,v); }); });
+    return m || null;
+  }
+  function chTxt(){ return st.c==='mx' ? (dupla() ? 'uma barra de cada: ' : 'misto: ') + st.c2.map(function(c){ return CHN[c]; }).join(' + ') : CHN[st.c]; }
+  function sabTxt(){
+    if (st.s==='Monte o seu') return 'Monte o seu ('+(st.mix.length?st.mix.join(', '):'grãos a combinar')+')';
+    if (st.s==='Meio a meio') return (dupla() ? 'uma barra de cada: ' : 'meio a meio: ') + (st.s2.length ? st.s2.join(' + ') : 'sabores a combinar');
+    return st.s;
+  }
+  function incompleto(){ return (st.s==='Monte o seu' && !st.mix.length) || (st.s==='Meio a meio' && st.s2.length<2) || (st.c==='mx' && st.c2.length<2); }
   var SAC = [], ADD = false, MAXI = 50, COD = (function(){ var a='ABCDEFGHJKMNPQRSTUVWXYZ23456789', r=''; for (var i=0;i<4;i++) r += a[Math.floor(Math.random()*a.length)]; return r; })();
   window.AURE_COD = COD;
   function itemAtual(){
     var p = preco(), mx = st.s==='Monte o seu';
     var tam = st.q==='+' ? st.n+' '+nome(st.f,2) : (st.f==='t' && st.q===1) ? '1 barra de 55 g' : st.q+' '+nome(st.f,st.q);
-    var sab = mx ? 'Monte o seu ('+(st.mix.length?st.mix.join(', '):'grãos a combinar')+')' : st.s;
-    return {f:st.f, q:st.q, n:st.q==='+'?st.n:null, s:st.s, c:st.c, mix:mx?st.mix.slice():[], p:p||0, temP:!!p, tam:tam, sab:sab, ch:CHN[st.c]};
+    var sab = sabTxt();
+    if (dupla() && (st.c==='mx' || st.s==='Meio a meio')){ var cs = chocs(), ss = sabs(); sab = 'Barra 1: '+(ss[0]||'a combinar')+' em '+CHN[cs[0]]+' / Barra 2: '+(ss[1]||ss[0]||'a combinar')+' em '+CHN[cs[1]||cs[0]]; }
+    return {f:st.f, q:st.q, n:st.q==='+'?st.n:null, s:st.s, c:st.c, c2:st.c==='mx'?st.c2.slice():[], s2:st.s==='Meio a meio'?st.s2.slice():[], mix:mx?st.mix.slice():[], p:p||0, temP:!!p, tam:tam, sab:sab, ch:(dupla() && (st.c==='mx' || st.s==='Meio a meio')) ? '' : chTxt()};
   }
   function itensPedido(){ return ADD ? SAC.slice() : SAC.concat([itemAtual()]); }
   function desenhaSacola(){
@@ -499,7 +521,7 @@ void main(){
     else {
       var tot = its.reduce(function(a,i){ return a+(i.p||0); },0), falta = its.some(function(i){ return !i.temP; });
       box.innerHTML = '<span class="rotulo">Sua sacola · '+its.length+(its.length>1?' itens':' item')+'</span>'
-        + SAC.map(function(i,k){ return '<div class="sc-it"><div class="n">'+i.tam+'<small>'+i.sab+' · '+i.ch+'</small></div><div class="v">'+(i.temP?brl(i.p):'a confirmar')+'</div><button class="x" type="button" data-rm="'+k+'" aria-label="Tirar da sacola">✕</button></div>'; }).join('')
+        + SAC.map(function(i,k){ return '<div class="sc-it"><div class="n">'+i.tam+'<small>'+[i.sab,i.ch].filter(Boolean).join(' · ')+'</small></div><div class="v">'+(i.temP?brl(i.p):'a confirmar')+'</div><button class="x" type="button" data-rm="'+k+'" aria-label="Tirar da sacola">✕</button></div>'; }).join('')
         + (ADD ? '' : (function(i){ return '<div class="sc-it agora"><div class="n">'+i.tam+'<small>montando agora · entra no pedido</small></div><div class="v">'+(i.temP?brl(i.p):'a confirmar')+'</div></div>'; })(itemAtual()))
         + '<div class="sc-tot"><span>Total</span><b>'+brl(tot)+(falta?' + a confirmar':'')+'</b></div>';
       box.classList.add('on');
@@ -509,7 +531,7 @@ void main(){
     var pd = $('#pedir'); if (pd && !pd.dataset.enviando) pd.innerHTML = (its.length>1 ? 'Pedir tudo ('+its.length+' itens) pelo WhatsApp' : 'Pedir pelo WhatsApp')+' <span class="seta">→</span>';
   }
   function render(pulse){
-    if (st.f==='t'){ if (st.q!==1 && st.q!==2) st.q = (st.s==='Sortida' ? 2 : 1); if (st.s==='Sortida' && st.q===1) st.s = 'Clássica'; }
+    if (st.f==='t'){ if (st.q!==1 && st.q!==2) st.q = (st.s==='Sortida' ? 2 : 1); if (st.q===1){ if (st.s==='Sortida' || st.s==='Meio a meio') st.s = 'Clássica'; if (st.c==='mx') st.c = '40'; } }
     else if (st.q===1 || st.q===2) st.q = 4;
     botoesQ();
     document.querySelectorAll('#g-fmt .op').forEach(function(b){ b.classList.toggle('on', b.dataset.f===st.f); });
@@ -517,23 +539,37 @@ void main(){
     document.querySelectorAll('#g-c .op').forEach(function(b){ b.classList.toggle('on', b.dataset.c===st.c); });
     document.querySelectorAll('#g-s .op').forEach(function(b){ b.classList.toggle('on', b.dataset.s===st.s); });
     $('#qtd').style.display = st.q==='+' ? 'flex' : 'none'; $('#qn').textContent = st.n;
-    var p = preco(), ch = CHN[st.c];
+    var p = preco(), ch = chTxt();
+    var um = st.f==='t' && st.q===1, du = dupla();
+    $('#op-mx').style.display = um ? 'none' : ''; $('#op-mm').style.display = um ? 'none' : '';
+    $('#op-mx-s').textContent = du ? 'Uma barra de cada chocolate' : 'Metade de cada chocolate';
+    $('#op-mm-s').textContent = du ? 'Uma barra de cada sabor' : 'Dois sabores na mesma caixa';
+    $('#c2').style.display = st.c==='mx' ? 'block' : 'none';
+    document.querySelectorAll('#c2 .gchip').forEach(function(b){ var i = st.c2.indexOf(b.dataset.c2); b.classList.toggle('on', i>-1); b.setAttribute('data-ord', du && i>-1 ? 'Barra '+(i+1) : ''); });
+    $('#c2-t').textContent = du ? 'Chocolate de cada barra' : 'Escolha os 2 chocolates';
+    $('#c2-n').textContent = st.c2.length+' de 2';
+    $('#c2-obs').textContent = du ? 'O primeiro que você tocar é a barra 1, o segundo é a barra 2. O preço segue o chocolate mais nobre.' : 'Metade da caixa em cada chocolate. O preço segue o chocolate mais nobre.';
+    $('#s2').style.display = st.s==='Meio a meio' ? 'block' : 'none';
+    document.querySelectorAll('#s2 .gchip').forEach(function(b){ var i = st.s2.indexOf(b.dataset.s2); b.classList.toggle('on', i>-1); b.setAttribute('data-ord', du && i>-1 ? 'Barra '+(i+1) : ''); });
+    $('#s2-t').textContent = du ? 'Sabor de cada barra' : 'Escolha os 2 sabores';
+    $('#s2-n').textContent = st.s2.length+' de 2';
+    $('#s2-obs').textContent = du ? 'O primeiro que você tocar é a barra 1, o segundo é a barra 2. O preço segue o sabor mais caro.' : 'Metade da caixa de cada sabor. O preço segue o sabor mais caro.';
     var tam = st.q==='+' ? st.n+' '+nome(st.f,2) : (st.f==='t' && st.q===1) ? '1 barra de 55 g (no saquinho)' : st.q+' '+nome(st.f,st.q);
     var mx = st.s==='Monte o seu';
     $('#mix').style.display = mx ? 'block' : 'none';
     document.querySelectorAll('#mix .gchip').forEach(function(b){ b.classList.toggle('on', st.mix.indexOf(b.dataset.g)>-1); });
     $('#mix-n').textContent = st.mix.length ? st.mix.length+' de 4 escolhidos' : 'Escolha até 4';
-    var desc = mx ? (st.mix.length ? st.mix.join(', ') : 'escolha os grãos') : ((st.f==='t' && st.s==='Sortida') ? 'uma barra de cada sabor, você escolhe os dois' : (D.s.find(function(x){ return x[0]===st.s; })||[,''])[1]);
-    var v = $('#valor'); v.textContent = p ? brl(p) : ((st.s==='Monte o seu' && !st.mix.length) ? 'R$ —' : 'Sob consulta');
+    var desc = mx ? (st.mix.length ? st.mix.join(', ') : 'escolha os grãos') : st.s==='Meio a meio' ? (st.s2.length ? st.s2.join(' + ') : 'escolha os 2 sabores') : ((st.f==='t' && st.s==='Sortida') ? 'uma barra de cada sabor, você escolhe os dois' : (D.s.find(function(x){ return x[0]===st.s; })||[,''])[1]);
+    var v = $('#valor'); v.textContent = p ? brl(p) : (incompleto() ? 'R$ —' : 'Sob consulta');
     if (pulse){ v.classList.remove('pop'); void v.offsetWidth; v.classList.add('pop'); }
     $('#det').innerHTML = (st.f==='t'&&st.q===1?'':'Caixa com ')+'<b style="color:var(--texto);font-weight:400">'+tam+'</b>, sabor <b style="color:var(--texto);font-weight:400">'+st.s+'</b> ('+desc.toLowerCase()+'), chocolate '+ch+'.';
-    $('#sinal').innerHTML = (mx && !st.mix.length) ? 'Escolha pelo menos 1 grão pra ver o preço' : p ? 'Sinal de 50% no Pix: <b>'+brl(p/2)+'</b> · o restante na retirada' : 'A gente confirma o valor pelo WhatsApp';
+    $('#sinal').innerHTML = (mx && !st.mix.length) ? 'Escolha pelo menos 1 grão pra ver o preço' : (st.s==='Meio a meio' && st.s2.length<2) ? 'Escolha os 2 sabores pra ver o preço' : (st.c==='mx' && st.c2.length<2) ? 'Escolha os 2 chocolates pra ver o preço' : p ? 'Sinal de 50% no Pix: <b>'+brl(p/2)+'</b> · o restante na retirada' : 'A gente confirma o valor pelo WhatsApp';
     var nomeC = ($('#f-nome').value||'').trim(), dataC = ($('#f-data').value||'').trim(), horaC = ($('#f-hora').value||'').trim(), pres = $('#f-pres').checked, telC = ($('#f-tel').value||'').trim(), cartC = ($('#f-cart').value||'').trim();
     $('#l-cart').style.display = pres ? '' : 'none';
     var fmtData = dataC ? dataC.split('-').reverse().join('/') : '';
     var its = itensPedido(), totP = its.reduce(function(a,i){ return a+(i.p||0); },0), falta = its.some(function(i){ return !i.temP; });
     var msg = 'Olá, Aure! Quero fazer uma encomenda (código '+COD+'):\n\n'
-      + its.map(function(i,k){ return (its.length>1?(k+1)+') ':'• ')+i.tam+' · '+i.sab+' · '+i.ch+' · '+(i.temP?brl(i.p):'valor a confirmar'); }).join('\n') + '\n'
+      + its.map(function(i,k){ return (its.length>1?(k+1)+') ':'• ')+[i.tam,i.sab,i.ch].filter(Boolean).join(' · ')+' · '+(i.temP?brl(i.p):'valor a confirmar'); }).join('\n') + '\n'
       + (totP ? '\nTotal: '+brl(totP)+(falta?' + itens a confirmar':'')+' (sinal de 50%: '+brl(totP/2)+')\n' : '\nValor: a confirmar\n')
       + '\nMeus dados:\n'
       + 'Nome: '+(nomeC||'')+'\n'
@@ -547,12 +583,14 @@ void main(){
   document.addEventListener('click', function(e){
     var b = e.target.closest('button'); if(!b) return;
     var d = b.dataset, mudou = false;
-    if (b.id==='add-cx'){ if (SAC.length>=MAXI) return; var it = itemAtual(); if (st.s==='Monte o seu' && !st.mix.length) return; SAC.push(it); ADD = true; render(false); var sc = $('#sacola'); sc.animate && sc.animate([{transform:'scale(.97)'},{transform:'scale(1)'}],{duration:300}); var al = $('#monte'); if (window.__lenis) window.__lenis.scrollTo(al,{duration:1.2}); else al.scrollIntoView({behavior:'smooth'}); return; }
+    if (b.id==='add-cx'){ if (SAC.length>=MAXI) return; var it = itemAtual(); if (incompleto()) return; SAC.push(it); ADD = true; render(false); var sc = $('#sacola'); sc.animate && sc.animate([{transform:'scale(.97)'},{transform:'scale(1)'}],{duration:300}); var al = $('#monte'); if (window.__lenis) window.__lenis.scrollTo(al,{duration:1.2}); else al.scrollIntoView({behavior:'smooth'}); return; }
     if (d.rm !== undefined){ SAC.splice(+d.rm,1); if (!SAC.length) ADD = false; render(false); return; }
     if (d.f){ st.f = d.f; mudou = true; }
     if (d.q){ st.q = d.q==='+' ? '+' : +d.q; mudou = true; }
     if (d.c){ st.c = d.c; mudou = true; }
     if (d.s){ st.s = d.s; if (st.f==='t' && d.s==='Sortida') st.q = 2; mudou = true; }
+    if (d.c2){ var j = st.c2.indexOf(d.c2); if (j>-1) st.c2.splice(j,1); else { if (st.c2.length>=2) st.c2.shift(); st.c2.push(d.c2); } mudou = true; }
+    if (d.s2){ var k = st.s2.indexOf(d.s2); if (k>-1) st.s2.splice(k,1); else { if (st.s2.length>=2) st.s2.shift(); st.s2.push(d.s2); } mudou = true; }
     if (d.g){ var i = st.mix.indexOf(d.g); if (i>-1) st.mix.splice(i,1); else if (st.mix.length<4) st.mix.push(d.g); mudou = true; }
     if (d.d){ st.n = Math.max(11, st.n + (+d.d)); mudou = true; }
     if (d.sabor){ st.s = d.sabor; render(true); var alvo = $('#monte'); if (window.__lenis) window.__lenis.scrollTo(alvo,{duration:1.8}); else alvo.scrollIntoView({behavior:'smooth'}); return; }
@@ -753,8 +791,9 @@ window.addEventListener('scroll',function(){var t=document.querySelector('.topo'
         var itens = (P.itens||[]).slice(0,50).map(function(I){
           var n = I.q==='+' ? (I.n||12) : I.q;
           var tam = I.f==='t' ? (n===1?'1 barra 55 g':'Caixa 2 barras 55 g') : 'Caixa '+n+' '+(I.f==='q'?'quadradinhos':'barrinhas');
-          return {tipo:'cx', nome: tam+' · '+(I.s==='Monte o seu' ? 'Monte o seu ('+(I.mix.join(', ')||'a combinar')+')' : I.s)+' · '+CN[I.c],
-            qtd:1, preco:I.p||0, custo:0, f:I.f, q:I.q, n:I.n, s:I.s, c:I.c, mix:I.mix}; });
+          var chN = I.c==='mx' ? 'misto ('+(I.c2||[]).map(function(c){ return CN[c]; }).join(' + ')+')' : CN[I.c];
+          var nm = (I.f==='t' && n===2 && (I.c==='mx' || I.s==='Meio a meio')) ? tam+' · '+I.sab : tam+' · '+I.sab+' · '+chN;
+          return {tipo:'cx', nome: nm, qtd:1, preco:I.p||0, custo:0, f:I.f, q:I.q, n:I.n, s:I.s, c:I.c, c2:I.c2||[], s2:I.s2||[], mix:I.mix}; });
         if (!itens.length) return ok(false);
         var totalP = Math.round(itens.reduce(function(a,i){ return a+(i.preco||0); },0)*100)/100;
         var doc = {cliente:(P.cliente||'Cliente do cardápio').slice(0,80), tel:String(P.tel||'').slice(0,20), presente:!!P.presente, cartao:String(P.cartao||'').slice(0,140), entrega:P.entrega||'', hora:P.hora||'',

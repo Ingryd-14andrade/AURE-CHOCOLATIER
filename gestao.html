@@ -617,7 +617,11 @@ const arrumando = new Set();
 async function arrumarPedido(id, e){ // completa custo da caixa e liga a cliente
   if(e.origem!=='cardapio' || e.conferido || arrumando.has(id)) return; arrumando.add(id);
   try{
-    const itens = (e.itens||[]).map(i=>{ if(i.tipo!=='cx') return i; const r = cxCalc({f:i.f,q:i.q,n:i.n,s:i.s,c:i.c,mix:i.mix||[]}); return {...i,custo:r.custo||0,nome:cxNome({f:i.f,q:i.q,n:i.n,s:i.s,c:i.c,mix:i.mix||[]})}; });
+    const itens = (e.itens||[]).map(i=>{ if(i.tipo!=='cx') return i;
+      if(i.c==='mx' || i.s==='Meio a meio'){ const cs = i.c==='mx' ? (i.c2||[]) : [i.c], ss = i.s==='Meio a meio' ? (i.s2||[]) : [i.s]; let t = 0, n = 0;
+        ss.forEach(sb=>cs.forEach(cc=>{ try{ const r = cxCalc({f:i.f,q:i.q,n:i.n,s:sb,c:cc,mix:i.mix||[]}); if(r && r.custo){ t += r.custo; n++; } }catch(x){} }));
+        return {...i, custo: n ? Math.round(t/n*100)/100 : 0}; }
+      const r = cxCalc({f:i.f,q:i.q,n:i.n,s:i.s,c:i.c,mix:i.mix||[]}); return {...i,custo:r.custo||0,nome:cxNome({f:i.f,q:i.q,n:i.n,s:i.s,c:i.c,mix:i.mix||[]})}; });
     if(e.aguardandoZap){ const pz = {...e, id, itens, conferido:true}; await put('encomendas', id, pz); S.pend[id] = pz; later(); return; }
     const b0 = {...e, id, itens, conferido:true};
     const k = chaveJunta(b0), alvo = (k && podeJuntar(b0)) ? Object.values(S.enc).find(x=>x.id!==id && x.conferido && podeJuntar(x) && chaveJunta(x)===k) : null;
