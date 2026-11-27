@@ -518,7 +518,7 @@ const CLOCK = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" strok
 
 /* ===== dados ===== */
 const COLS = {ingredientes:'ing',compras:'comp',produtos:'prod',fornadas:'forn',vendas:'vend',encomendas:'enc',clientes:'cli',movimentacoes:'mov'};
-const S = {ing:{},comp:{},prod:{},forn:{},vend:{},enc:{},cli:{},mov:{},cfg:{markup:3}};
+const S = {ing:{},comp:{},prod:{},forn:{},vend:{},enc:{},pend:{},cli:{},mov:{},cfg:{markup:3}};
 const UI = {plan:{}, armed:null, tab:'inicio', nota:'', antes:null};
 let db = null, mode = 'connecting', readOnly = false;
 function loadLocal(){ try{ const d = JSON.parse(localStorage.getItem('aure')||localStorage.getItem('cacaulab')||'null'); if(d) Object.assign(S,d); }catch(e){} }
@@ -557,7 +557,7 @@ async function boot(){
   const done = k => { pending.delete(k); if(!pending.size){ clearTimeout(timer); mode='online'; } };
   const fail = () => { clearTimeout(timer); mode='erro'; later(); };
   for (const [col,key] of Object.entries(COLS)){
-    db.collection(col).onSnapshot(snap=>{ const o = {}; snap.docs.forEach(x=>{ o[x.id] = {id:x.id,...x.data()}; }); S[key] = o; if(col==='encomendas') chegou(snap); if(!snap.metadata.fromCache) done(col); later(); }, fail);
+    db.collection(col).onSnapshot(snap=>{ const o = {}; snap.docs.forEach(x=>{ o[x.id] = {id:x.id,...x.data()}; }); if(col==='encomendas'){ const a = {}, pz = {}; for(const k in o) (o[k].aguardandoZap ? pz : a)[k] = o[k]; S.enc = a; S.pend = pz; chegou(snap); } else S[key] = o; if(!snap.metadata.fromCache) done(col); later(); }, fail);
   }
   db.doc('config/precos').onSnapshot(s=>{ if(s.exists){ S.calc = s.data(); later(); } }, ()=>{});
   db.doc('config/geral').onSnapshot(s=>{ S.cfg = Object.assign({markup:3}, s.exists?s.data():{}); if(!s.metadata.fromCache) done('config'); later(); }, fail);
@@ -573,12 +573,32 @@ let primeiraCarga = true;
 function chegou(snap){
   if(primeiraCarga){ primeiraCarga = false; const ds = snap.docs.map(x=>[x.id,x.data()]).sort((a,b)=>String(a[1].criado||'').localeCompare(String(b[1].criado||''))); ds.forEach(([id,e])=>{ filaPed = filaPed.then(()=>arrumarPedido(id,e)); }); filaPed = filaPed.then(juntarExistentes); return; }
   snap.docChanges().forEach(ch=>{ if(ch.type!=='added' || ch.doc.metadata.hasPendingWrites) return; const e = ch.doc.data();
-    if(e.origem==='cardapio'){ toast('🍫 Novo pedido de '+String(e.cliente||'cliente').split(' ')[0]); tocarSino(); try{ navigator.vibrate && navigator.vibrate([120,60,120]); }catch(_){} UI.novo = ch.doc.id; }
+    if(e.origem==='cardapio' && !e.aguardandoZap){ toast('🍫 Novo pedido de '+String(e.cliente||'cliente').split(' ')[0]); tocarSino(); try{ navigator.vibrate && navigator.vibrate([120,60,120]); }catch(_){} UI.novo = ch.doc.id; }
     const id = ch.doc.id; filaPed = filaPed.then(()=>arrumarPedido(id, e)); });
 }
 let filaPed = Promise.resolve();
 const chaveJunta = e => (e && e.entrega && telOk(e.tel)) ? dig(e.tel).slice(-8)+'|'+e.entrega+'|'+(e.hora||'') : null;
 const podeJuntar = e => e && e.status!=='entregue' && !((e.sinal||0)>0);
+async function zapChegou(id){
+  const e = S.pend[id]; if(!e) return;
+  const b0 = {...clone(e), aguardandoZap:false, visto:false, chegouZap:new Date().toISOString()};
+  delete S.pend[id];
+  const k = chaveJunta(b0), alvo = k ? Object.values(S.enc).find(x=>x.id!==id && podeJuntar(x) && chaveJunta(x)===k) : null;
+  try{
+    if(alvo){ const m = juntarDocs(alvo, b0); await put('encomendas', alvo.id, m); S.enc[alvo.id] = m; await del('encomendas', id); UI.novo = alvo.id; toast('🔗 Juntei com o pedido que ela já tinha'); }
+    else { const b = {...b0, num:proxNum()}; try{ b.clienteId = await upsertCli(b); }catch(x){} await put('encomendas', id, b); S.enc[id] = b; UI.novo = id; toast('✅ Pedido de '+String(b.cliente||'').split(' ')[0]+' ativado'); }
+  }catch(x){ toast('Não consegui ativar, tente de novo'); }
+  UI.zq = {tel:'',nome:''}; later();
+}
+const tempo = iso => { try{ const d = new Date(iso), m = Math.round((Date.now()-d)/60000); return m<1?'agora':m<60?'há '+m+' min':m<1440?'há '+Math.round(m/60)+' h':d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}); }catch(x){ return ''; } };
+function pendCard(e){ const its = (e.itens||[]).map(i=>esc(i.nome)).join('<br>');
+  return `<div class="es-card" style="border:1.5px dashed #d9b99b;background:#fffaf5">
+    <div class="es-top" style="cursor:default"><div class="es-l"><div class="es-dt">${e.codigo?'Código '+esc(e.codigo)+' · ':''}montou ${tempo(e.criado)}${e.entrega?' · retirada '+esc(diaTxt(e.entrega)):''}</div>
+      <div class="es-nm">${esc(e.cliente||'Sem nome')}</div><div class="es-it">${its||'—'}</div>${e.tel?`<div class="es-it" style="margin-top:4px">📱 ${esc(e.tel)}</div>`:''}</div>
+      <div class="es-v">${brl(e.total)}</div></div>
+    <div class="es-acts"><button class="es-go" data-act="zap-ok" data-id="${e.id}" style="background:#25d366;color:#fff">✅ Chegou no Zap · ativar</button><button class="es-nt" data-act="zap-del" data-id="${e.id}">🗑</button></div></div>`; }
+function pendSec(){ const l = Object.values(S.pend||{}).sort((a,b)=>String(b.criado||'').localeCompare(String(a.criado||''))); if(!l.length) return '';
+  return `<section class="col" style="background:#fbf6f0"><div class="col-h"><span class="dot" style="background:#d9b99b"></span>Montaram no cardápio, mas ainda não mandaram no Zap<em>${l.length}</em></div><div class="es-sub" style="margin:-4px 6px 10px">Só vira pedido quando a mensagem chegar no seu WhatsApp. Aí toque em “Chegou no Zap”.</div>${l.map(pendCard).join('')}</section>`; }
 function juntarDocs(a, b){ // b entra dentro de a
   const cart = [a.cartao,b.cartao].filter(Boolean).filter((v,i,arr)=>arr.indexOf(v)===i).join(' / ').slice(0,280);
   return {...a, itens:[...(a.itens||[]),...(b.itens||[])], total:Math.round(((a.total||0)+(b.total||0))*100)/100, presente:!!(a.presente||b.presente), cartao:cart, cliente:a.cliente||b.cliente, visto:false, juntou:(a.juntou||1)+(b.juntou||1), conferido:true};
@@ -597,6 +617,7 @@ async function arrumarPedido(id, e){ // completa custo da caixa e liga a cliente
   if(e.origem!=='cardapio' || e.conferido || arrumando.has(id)) return; arrumando.add(id);
   try{
     const itens = (e.itens||[]).map(i=>{ if(i.tipo!=='cx') return i; const r = cxCalc({f:i.f,q:i.q,n:i.n,s:i.s,c:i.c,mix:i.mix||[]}); return {...i,custo:r.custo||0,nome:cxNome({f:i.f,q:i.q,n:i.n,s:i.s,c:i.c,mix:i.mix||[]})}; });
+    if(e.aguardandoZap){ const pz = {...e, id, itens, conferido:true}; await put('encomendas', id, pz); S.pend[id] = pz; later(); return; }
     const b0 = {...e, id, itens, conferido:true};
     const k = chaveJunta(b0), alvo = (k && podeJuntar(b0)) ? Object.values(S.enc).find(x=>x.id!==id && x.conferido && podeJuntar(x) && chaveJunta(x)===k) : null;
     if(alvo){ const m = juntarDocs(alvo, b0); await put('encomendas', alvo.id, m); S.enc[alvo.id] = m; await del('encomendas', id); delete S.enc[id]; if(UI.novo===id) UI.novo = alvo.id; toast('🔗 Juntei o pedido novo de '+String(m.cliente||'').split(' ')[0]+' com o que já existia'); later(); return; }
@@ -1345,7 +1366,7 @@ function vEnc(){
 function estLista(){
   const F = UI.f || {q:'',d:'',st:'todos'}, q = norm(F.q||'');
   let todos = Object.values(S.enc);
-  if(q) todos = todos.filter(e=>norm([e.cliente,e.num,(e.itens||[]).map(i=>i.nome).join(' '),e.obs,e.cartao].join(' ')).includes(q));
+  if(q) todos = todos.filter(e=>norm([e.cliente,e.num,e.codigo,(e.itens||[]).map(i=>i.nome).join(' '),e.obs,e.cartao].join(' ')).includes(q));
   if(F.d) todos = todos.filter(e=>e.entrega===F.d);
   const grupos = [['confirmar','Falta mandar a confirmação','Toque no botão verde pra mandar a confirmação com o Pix.','sinal'],['pix','Confirmação enviada · aguardando o Pix','Já mandou. Quando o Pix cair, toque em “Recebi o sinal”.','sinal'],['producao','Em produção','Sinal pago. Quando terminar, toque em “Ficou pronto”.'],['pronta','Pronto para retirar','Avise a cliente. Na retirada, toque em “Entregue”.'],['ok','Entregue','Pedidos que já saíram.']]
     .filter(g=>F.st==='todos'||F.st===g[0]||F.st===g[3]);
@@ -1355,7 +1376,7 @@ function estLista(){
   const html = grupos.map(([k,t,s,dk])=>{ let l = todos.filter(e=>sub(e)===k).sort(ord); if(k==='ok') l = l.reverse().slice(0, F.st==='ok'?50:6); total += l.length;
     return `<section class="col"><div class="col-h"><span class="dot d-${dk||k}"></span>${t}<em>${l.length}</em></div><div class="es-sub" style="margin:-4px 6px 10px">${s}</div>${l.length?l.map(estCard).join(''):'<div class="vazio">Nenhum pedido aqui.</div>'}</section>`; }).join('');
   setTimeout(()=>{ const c = $('#f-cnt'); if(c) c.textContent = total+' encomenda(s)'; },0);
-  return html;
+  return pendSec() + html;
 }
 /* ===== BAIXA DE ESTOQUE (quando o pedido fica pronto) ===== */
 const ING_ID = {'40':'choc-nobre-40','75':'choc-nobre-75','br':'choc-nobre-branco','Amendoim':'amendoim','Castanha de caju':'caju','Amêndoa':'amendoa','Avelã':'avela','Castanha-do-pará':'para','Nozes':'nozes','Pistache':'pistache','Damasco':'damasco','Blueberry':'blueberry','Goji berry':'goji','Uva passa':'uva-passa','Coco':'chips-coco'};
@@ -1482,8 +1503,9 @@ function tocarSino(forcar){
 /* ===== PEDIDOS NOVOS (chegaram do cardápio e ainda não foram vistos) ===== */
 const novos = () => Object.values(S.enc).filter(e=>e.origem==='cardapio' && !e.visto && e.status!=='entregue').sort((x,y)=>String(y.criado||'').localeCompare(String(x.criado||'')));
 function zqMatch(){ const z = UI.zq||{}; if(!telOk(z.tel)) return '';
-  const es = Object.values(S.enc).filter(e=>e.status!=='entregue' && sameTel(e.tel,z.tel)); if(!es.length) return '';
-  return es.map(e=>`<div style="background:#fff;border:1.5px solid #25d366;border-radius:20px;padding:14px;margin:0 0 10px"><div style="font:600 14px var(--sans);color:var(--wine);margin-bottom:4px">✅ Essa cliente já fez o pedido${e.num?' #'+e.num:''}</div><div style="font:400 13px var(--sans);color:#8a6f62;margin-bottom:10px">${esc(e.cliente)} · ${(e.itens||[]).map(i=>esc(i.nome)).join(', ')} · ${brl(e.total)}</div><div class="es-acts" style="margin:0">${waBtn(e)}</div></div>`).join(''); }
+  const pz = Object.values(S.pend||{}).filter(e=>sameTel(e.tel,z.tel)).map(e=>`<div style="background:#fff;border:1.5px dashed #25d366;border-radius:20px;padding:14px;margin:0 0 10px"><div style="font:600 14px var(--sans);color:var(--wine);margin-bottom:4px">📝 Ela montou um pedido no cardápio</div><div style="font:400 13px var(--sans);color:#8a6f62;margin-bottom:10px">${(e.itens||[]).map(i=>esc(i.nome)).join(', ')} · ${brl(e.total)}</div><button class="es-wa" style="border:0;width:100%" data-act="zap-ok" data-id="${e.id}">✅ Chegou no Zap · ativar pedido</button></div>`).join('');
+  const es = Object.values(S.enc).filter(e=>e.status!=='entregue' && sameTel(e.tel,z.tel)); if(!es.length) return pz;
+  return es.map(e=>`<div style="background:#fff;border:1.5px solid #25d366;border-radius:20px;padding:14px;margin:0 0 10px"><div style="font:600 14px var(--sans);color:var(--wine);margin-bottom:4px">✅ Essa cliente já fez o pedido${e.num?' #'+e.num:''}</div><div style="font:400 13px var(--sans);color:#8a6f62;margin-bottom:10px">${esc(e.cliente)} · ${(e.itens||[]).map(i=>esc(i.nome)).join(', ')} · ${brl(e.total)}</div><div class="es-acts" style="margin:0">${waBtn(e)}</div></div>`).join('') + pz; }
 function zapBox(){ const z = UI.zq || (UI.zq = {tel:'',nome:''});
   return `<div class="zq"><h3>💬 Cliente chamou no Zap?</h3><p>Cole o número dela aqui. Não precisa salvar o contato.</p>
   <input class="in" id="zq-tel" inputmode="tel" placeholder="Cole o WhatsApp · ex: 27 99999-9999" value="${esc(z.tel)}" aria-label="WhatsApp da cliente">
@@ -1876,6 +1898,8 @@ const A = {
   tab:d=>{ UI.tab = d.k; render(); window.scrollTo(0,0); },
   custos:custosSheet, 'custos-ok':salvarCustos, catalogo,
   'cat-copiar':()=>navigator.clipboard.writeText(catTexto()).then(()=>toast('Texto copiado')).catch(()=>toast('Não foi possível copiar')),
+  'zap-ok':d=>zapChegou(d.id),
+  'zap-del':(d,el)=>{ if(!arm('zd'+d.id)){ el.textContent = 'Apagar?'; return; } del('encomendas', d.id).then(()=>{ delete S.pend[d.id]; toast('Descartado'); later(); }).catch(()=>{}); },
   'zq-msg':d=>{ const z = UI.zq||{}; if(!telOk(z.tel)){ toast('Cole o WhatsApp da cliente primeiro'); const i=$('#zq-tel'); if(i) i.focus(); return; } window.open(wa(z.tel,fillMsg(d.k,{nome:z.nome})),'_blank'); },
   'zq-enc':()=>{ const z = UI.zq||{}; encomenda(null); ed.cliente = z.nome||''; ed.tel = z.tel||''; drawEnc(); UI.zq = {tel:'',nome:''}; },
   'enc-nova':()=>encomenda(null), enc:d=>{ marcarVisto(d.id); encomenda(d.id); }, 'ver-novos':()=>{ UI.tab='enc'; UI.f={q:'',d:'',st:'sinal'}; later(); window.scrollTo(0,0); },
