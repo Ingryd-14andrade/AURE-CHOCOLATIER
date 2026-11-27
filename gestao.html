@@ -573,6 +573,7 @@ let primeiraCarga = true;
 function chegou(snap){
   if(primeiraCarga){ primeiraCarga = false; const ds = snap.docs.map(x=>[x.id,x.data()]).sort((a,b)=>String(a[1].criado||'').localeCompare(String(b[1].criado||''))); ds.forEach(([id,e])=>{ filaPed = filaPed.then(()=>arrumarPedido(id,e)); }); filaPed = filaPed.then(juntarExistentes); return; }
   snap.docChanges().forEach(ch=>{ if(ch.type!=='added' || ch.doc.metadata.hasPendingWrites) return; const e = ch.doc.data();
+    if(e.origem==='cardapio' && e.aguardandoZap){ toast('📝 '+String(e.cliente||'Alguém').split(' ')[0]+' montou um pedido no cardápio'); }
     if(e.origem==='cardapio' && !e.aguardandoZap){ toast('🍫 Novo pedido de '+String(e.cliente||'cliente').split(' ')[0]); tocarSino(); try{ navigator.vibrate && navigator.vibrate([120,60,120]); }catch(_){} UI.novo = ch.doc.id; }
     const id = ch.doc.id; filaPed = filaPed.then(()=>arrumarPedido(id, e)); });
 }
@@ -1512,8 +1513,10 @@ function zapBox(){ const z = UI.zq || (UI.zq = {tel:'',nome:''});
   <input class="in" id="zq-nome" placeholder="Nome (opcional)" value="${esc(z.nome)}" aria-label="Nome da cliente">
   <div id="zq-match">${zqMatch()}</div>
   <div class="zq-b"><button data-act="zq-msg" data-k="catalogo">🍫 Mandar cardápio</button><button data-act="zq-msg" data-k="pix">💳 Mandar Pix</button><button class="zq-n" data-act="zq-enc">+ Criar pedido dela</button></div></div>`; }
-function novosBanner(){ const n = novos(); if(!n.length) return '';
-  return `<button class="novo-b" data-act="ver-novos"><span class="sino">🔔</span><div><b>${n.length===1?'Chegou 1 pedido novo!':'Chegaram '+n.length+' pedidos novos!'}</b><small>${n.slice(0,3).map(e=>esc(String(e.cliente||'').split(' ')[0])+' · '+esc(((e.itens||[])[0]||{}).nome||'').replace(/^Caixa /,'')).join('<br>')}</small></div><span class="ir">ver ›</span></button>`; }
+function novosBanner(){ const n = novos(), pz = Object.values(S.pend||{});
+  const pb = pz.length ? `<button class="novo-b" data-act="tab" data-k="enc" style="background:linear-gradient(135deg,#fffaf4,#f6ece1);color:var(--wine);border:1.5px dashed #d9b99b"><span class="sino">📝</span><div><b>${pz.length===1?'1 pedido montado no cardápio':pz.length+' pedidos montados no cardápio'}</b><small style="color:#8a6f62">${pz.slice(0,3).map(e=>esc(String(e.cliente||'').split(' ')[0])+(e.codigo?' · código '+esc(e.codigo):'')).join('<br>')}<br>Chegou no Zap? Toque pra ativar</small></div><span class="ir" style="color:var(--wine)">ver ›</span></button>` : '';
+  if(!n.length) return pb;
+  return `<button class="novo-b" data-act="ver-novos"><span class="sino">🔔</span><div><b>${n.length===1?'Chegou 1 pedido novo!':'Chegaram '+n.length+' pedidos novos!'}</b><small>${n.slice(0,3).map(e=>esc(String(e.cliente||'').split(' ')[0])+' · '+esc(((e.itens||[])[0]||{}).nome||'').replace(/^Caixa /,'')).join('<br>')}</small></div><span class="ir">ver ›</span></button>` + pb; }
 async function marcarVisto(id){ const e = S.enc[id]; if(!e || e.visto || e.origem!=='cardapio') return; try{ await put('encomendas',id,{...clone(e),visto:true}); }catch(x){} }
 /* ===== PRODUÇÃO (agenda da semana + checklist) ===== */
 const ETAPAS_PROD = ['Temperar o chocolate','Moldar nas formas','Cobrir com os grãos','Desenformar','Embalar e etiquetar'];
