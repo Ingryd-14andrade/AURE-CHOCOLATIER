@@ -485,6 +485,7 @@ void main(){
   }
   function preco(){ if (st.s==='Monte o seu') return precoMix(); return st.q==='+' ? null : D.p[st.s+'|'+st.f+st.q+'|'+st.c]; }
   var SAC = [], ADD = false, MAXI = 50, COD = (function(){ var a='ABCDEFGHJKMNPQRSTUVWXYZ23456789', r=''; for (var i=0;i<4;i++) r += a[Math.floor(Math.random()*a.length)]; return r; })();
+  window.AURE_COD = COD;
   function itemAtual(){
     var p = preco(), mx = st.s==='Monte o seu';
     var tam = st.q==='+' ? st.n+' '+nome(st.f,2) : (st.f==='t' && st.q===1) ? '1 barra de 55 g' : st.q+' '+nome(st.f,st.q);
@@ -735,11 +736,19 @@ window.addEventListener('scroll',function(){var t=document.querySelector('.topo'
   /* ===== envia o pedido direto para o app da Aure (Firebase) ===== */
   var FIREBASE = self.AURE_FIREBASE || { apiKey: "COLE_AQUI" };
   var PEDIDO = null;
+  function fsVal(v){
+    if (v === null || v === undefined) return {nullValue:null};
+    if (typeof v === 'boolean') return {booleanValue:v};
+    if (typeof v === 'number') return Number.isInteger(v) ? {integerValue:String(v)} : {doubleValue:v};
+    if (Array.isArray(v)) return {arrayValue:{values:v.map(fsVal)}};
+    if (typeof v === 'object') return {mapValue:{fields:fsCampos(v)}};
+    return {stringValue:String(v)};
+  }
+  function fsCampos(o){ var f = {}; Object.keys(o).forEach(function(k){ if (o[k] !== undefined) f[k] = fsVal(o[k]); }); return f; }
   function salvarNoApp(){
     return new Promise(function(ok){
       try{
-        if (!window.firebase || !PEDIDO || /^COLE/.test(FIREBASE.apiKey)) return ok(false);
-        if (!firebase.apps.length) firebase.initializeApp(FIREBASE);
+        if (!PEDIDO || !FIREBASE || /^COLE/.test(FIREBASE.apiKey||'')) return ok(false);
         var P = PEDIDO, CN = {'40':'40%','75':'75%','br':'branco'};
         var itens = (P.itens||[]).slice(0,50).map(function(I){
           var n = I.q==='+' ? (I.n||12) : I.q;
@@ -750,9 +759,14 @@ window.addEventListener('scroll',function(){var t=document.querySelector('.topo'
         var totalP = Math.round(itens.reduce(function(a,i){ return a+(i.preco||0); },0)*100)/100;
         var doc = {cliente:(P.cliente||'Cliente do cardápio').slice(0,80), tel:String(P.tel||'').slice(0,20), presente:!!P.presente, cartao:String(P.cartao||'').slice(0,140), entrega:P.entrega||'', hora:P.hora||'',
           itens:itens, total:totalP, pag:'Pix', sinal:0, obs:'',
-          status:'aberta', origem:'cardapio', aguardandoZap:true, codigo:COD, criado:new Date().toISOString()};
-        var t = setTimeout(function(){ ok(false); }, 3500);
-        firebase.firestore().collection('encomendas').add(doc).then(function(){ clearTimeout(t); ok(true); }, function(){ clearTimeout(t); ok(false); });
+          status:'aberta', origem:'cardapio', aguardandoZap:true, codigo:(window.AURE_COD||''), criado:new Date().toISOString()};
+        var feito = false, fim = function(v){ if (!feito){ feito = true; clearTimeout(t); ok(v); } };
+        var t = setTimeout(function(){ fim(false); }, 8000);
+        var viaSDK = function(){ try{ if (!window.firebase) return fim(false); if (!firebase.apps.length) firebase.initializeApp(FIREBASE);
+          firebase.firestore().collection('encomendas').add(doc).then(function(){ fim(true); }, function(){ fim(false); }); }catch(x){ fim(false); } };
+        var url = 'https://firestore.googleapis.com/v1/projects/'+FIREBASE.projectId+'/databases/(default)/documents/encomendas?key='+FIREBASE.apiKey;
+        fetch(url, {method:'POST', keepalive:true, headers:{'Content-Type':'application/json'}, body:JSON.stringify({fields:fsCampos(doc)})})
+          .then(function(r){ if (r.ok) fim(true); else viaSDK(); }, viaSDK);
       }catch(e){ ok(false); }
     });
   }
