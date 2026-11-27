@@ -765,7 +765,7 @@ window.addEventListener('scroll',function(){var t=document.querySelector('.topo'
         var viaSDK = function(){ try{ if (!window.firebase) return fim(false); if (!firebase.apps.length) firebase.initializeApp(FIREBASE);
           firebase.firestore().collection('encomendas').add(doc).then(function(){ fim(true); }, function(){ fim(false); }); }catch(x){ fim(false); } };
         var url = 'https://firestore.googleapis.com/v1/projects/'+FIREBASE.projectId+'/databases/(default)/documents/encomendas?key='+FIREBASE.apiKey;
-        fetch(url, {method:'POST', keepalive:true, headers:{'Content-Type':'application/json'}, body:JSON.stringify({fields:fsCampos(doc)})})
+        fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({fields:fsCampos(doc)})})
           .then(function(r){ if (r.ok) fim(true); else viaSDK(); }, viaSDK);
       }catch(e){ ok(false); }
     });
